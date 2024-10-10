@@ -31,9 +31,7 @@ public class MecanumDrive extends LinearOpMode {
 
         waitForStart();
 
-        if (isStopRequested()) return;
-
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
             // Movement stick
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;
@@ -49,23 +47,22 @@ public class MecanumDrive extends LinearOpMode {
 
             double power = Math.hypot(x, y);
 
-            double inputAngle = Math.atan2(y, x);
             double botAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
+            double inputAngle = Math.atan2(y, x);
             double movementAngle = inputAngle - botAngle;
 
+            // Calculate the directional components of movement
             double cos = Math.cos(movementAngle - Math.PI / 4);
             double sin = Math.sin(movementAngle - Math.PI / 4);
 
-            // frontLeft and backRight are both cos because they are opposite corners (and have the same movement vector)
+            // Now calculate the motor powers
             double frontLeftPower = cos * power + turn;
+            double backLeftPower = sin * power + turn;
+            double frontRightPower = sin * power - turn;
             double backRightPower = cos * power - turn;
 
-            // frontRight and backLeft are both sin because they are opposite corners (and have the same movement vector)
-            double frontRightPower = sin * power - turn;
-            double backLeftPower = sin * power + turn;
-
-            // Normalize the motor powers to ensure the highest power is 1 or -1
+            // Normalize motor powers to prevent exceeding maximum value
             double maxPower = Math.max(Math.abs(frontLeftPower),
                     Math.max(Math.abs(backLeftPower),
                             Math.max(Math.abs(frontRightPower), Math.abs(backRightPower))));
@@ -89,7 +86,7 @@ public class MecanumDrive extends LinearOpMode {
             telemetry.addData("Front Right Power", frontRightPower);
             telemetry.addData("Back Right Power", backRightPower);
 
-            Vector2 fieldPosition = getFieldPosition(frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor);
+            Vector2 fieldPosition = getFieldPosition(frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor, imu);
             telemetry.addData("Field X: ", fieldPosition.x);
             telemetry.addData("Field Y: ", fieldPosition.y);
 
@@ -97,7 +94,7 @@ public class MecanumDrive extends LinearOpMode {
         }
     }
 
-    private Vector2 getFieldPosition(DcMotor frontLeftMotor, DcMotor backLeftMotor, DcMotor frontRightMotor, DcMotor backRightMotor) {
+    private Vector2 getFieldPosition(DcMotor frontLeftMotor, DcMotor backLeftMotor, DcMotor frontRightMotor, DcMotor backRightMotor, IMU imu) {
         // Get the encoder positions (current motor ticks)
         int frontLeftPos = frontLeftMotor.getCurrentPosition();
         int backLeftPos = backLeftMotor.getCurrentPosition();
@@ -105,8 +102,8 @@ public class MecanumDrive extends LinearOpMode {
         int backRightPos = backRightMotor.getCurrentPosition();
 
         // Convert encoder ticks to distance moved (this conversion factor will depend on your specific motors and wheels)
-        double TICKS_PER_REV = 1120; // Example value, depends on your motor
-        double WHEEL_DIAMETER = 4.0; // Example value in inches
+        double TICKS_PER_REV = 537.7; // Example value, depends on your motor
+        double WHEEL_DIAMETER = 3.14961; // Example value in inches
         double CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
         double TICKS_PER_INCH = TICKS_PER_REV / CIRCUMFERENCE;
 
@@ -116,9 +113,18 @@ public class MecanumDrive extends LinearOpMode {
         double frontRightInches = frontRightPos / TICKS_PER_INCH;
         double backRightInches = backRightPos / TICKS_PER_INCH;
 
-        // Forward (Y) and Strafe (X) contributions from the motors
+        // Get XY position from the motors
+
+        // Calculate forward (Y) and strafe (X) movements based on the Mecanum drive configuration
         double forwardMovement = (frontLeftInches + backLeftInches + frontRightInches + backRightInches) / 4.0;
         double strafeMovement = (-frontLeftInches + backLeftInches + frontRightInches - backRightInches) / 4.0;
+
+        // Get the robot's current yaw (heading) from the IMU
+        double botYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+        // Use the yaw to calculate field-centric coordinates
+        double fieldX = strafeMovement * Math.cos(botYaw) - forwardMovement * Math.sin(botYaw);
+        double fieldY = strafeMovement * Math.sin(botYaw) + forwardMovement * Math.cos(botYaw);
 
         // You can adjust these values based on calibration to ensure accurate movement tracking
         return new Vector2(strafeMovement, forwardMovement);
