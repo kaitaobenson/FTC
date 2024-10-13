@@ -7,10 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Vector2 ;
 import org.firstinspires.ftc.robotcore.external.navigation.MotionDetection;
 
 @TeleOp
 public class MecanumDrive extends LinearOpMode {
+    private org.firstinspires.ftc.teamcode.Vector2 Vector2;
+
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
@@ -35,6 +38,8 @@ public class MecanumDrive extends LinearOpMode {
             // Movement stick
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;
+            Vector2 strafe_dir = new Vector2(x, y);
+
             // Rotation stick
             double rx = gamepad1.right_stick_x;
 
@@ -45,22 +50,22 @@ public class MecanumDrive extends LinearOpMode {
 
             double turn = rx * 0.5;
 
-            double power = Math.hypot(x, y);
+            double power = Math.hypot(x, y) / 2;
 
             double botAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-            double inputAngle = Math.atan2(y, x);
+            double inputAngle = strafe_dir.toAngle();
             double movementAngle = inputAngle - botAngle;
 
-            // Calculate the directional components of movement
-            double cos = Math.cos(movementAngle - Math.PI / 4);
-            double sin = Math.sin(movementAngle - Math.PI / 4);
+            // Rotate movement angle by 45 degrees (wheels are pointing 45 degrees)
+            // See the image pinned in the Discord server.
+            Vector2 rotated_dir = Vector2.fromAngle(movementAngle - Math.PI / 4);
 
             // Now calculate the motor powers
-            double frontLeftPower = cos * power + turn;
-            double backLeftPower = sin * power + turn;
-            double frontRightPower = sin * power - turn;
-            double backRightPower = cos * power - turn;
+            double frontLeftPower = rotated_dir.x * power + turn;
+            double backLeftPower = rotated_dir.y * power + turn;
+            double frontRightPower = rotated_dir.y * power - turn;
+            double backRightPower = rotated_dir.x * power - turn;
 
             // Normalize motor powers to prevent exceeding maximum value
             double maxPower = Math.max(Math.abs(frontLeftPower),
