@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package Opmodes;
 
 import android.util.Size;
 
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 @TeleOp
-public class AprilTagStuff extends LinearOpMode {
+public class AprilTagTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
