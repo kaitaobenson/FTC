@@ -50,7 +50,7 @@ public class MecanumDrive extends LinearOpMode {
             double botAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
             double inputAngle = Math.atan2(y, x);
-            double movementAngle = inputAngle - botAngle;
+            double movementAngle = inputAngle;
 
             // Calculate the directional components of movement
             double cos = Math.cos(movementAngle - Math.PI / 4);
@@ -86,9 +86,34 @@ public class MecanumDrive extends LinearOpMode {
             telemetry.addData("Front Right Power", frontRightPower);
             telemetry.addData("Back Right Power", backRightPower);
 
-            Vector2 fieldPosition = getFieldPosition(frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor, imu);
-            telemetry.addData("Field X: ", fieldPosition.x);
-            telemetry.addData("Field Y: ", fieldPosition.y);
+            //Vector2 fieldPosition = getFieldPosition(frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor, imu);
+            //telemetry.addData("Field X: ", fieldPosition.x);
+            //telemetry.addData("Field Y: ", fieldPosition.y);
+
+            /*
+            Here's a little camel because everything is in flames
+
+                              |~~~~~~~~~|
+            -------           |`        |
+            | o  o |_+_+_+_+_+|         |----|
+            | d    |                          }
+            -------        | |  |  \    |          _ }
+
+
+             */
+            DcMotor ascendMotorRight = hardwareMap.dcMotor.get("ascendMotorRight");
+            DcMotor ascendMotorLeft = hardwareMap.dcMotor.get("ascendMotorLeft");
+            float ascendPower = 0.0f;
+            if (gamepad1.a) {
+                ascendPower += 1.0f;
+            } else if (gamepad1.b) {
+                ascendPower -= 1.0f;
+            }
+
+            ascendMotorRight.setPower(ascendPower);
+            ascendMotorLeft.setPower(ascendPower);
+
+            telemetry.addData("Ascend Power", ascendPower);
 
             telemetry.update();
         }
