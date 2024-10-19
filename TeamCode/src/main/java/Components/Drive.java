@@ -11,8 +11,6 @@ import Util.Vector2;
 
 public class Drive {
 
-    public static final float rotationFactor = 0.5f;
-
     public DcMotor frontLeftMotor = null;
     public DcMotor frontRightMotor = null;
     public DcMotor backLeftMotor = null;
@@ -28,9 +26,16 @@ public class Drive {
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    public void stopMovement() {
+        frontLeftMotor.setPower(0);
+        backLeftMotor.setPower(0);
+        frontRightMotor.setPower(0);
+        backRightMotor.setPower(0);
+    }
+
     // Speed is from 0 to 1, imu is for bot rotation
     public void moveInDirection(Vector2 inputDirection, float inputRotation, float speed, IMU imu) {
-        inputRotation *= rotationFactor;
+        inputRotation *= speed;
 
         double inputAngle = inputDirection.toAngle();
         double power = Math.hypot(inputDirection.x, inputDirection.y) / 2;
@@ -64,6 +69,16 @@ public class Drive {
         backLeftMotor.setPower(backLeftPower);
         frontRightMotor.setPower(frontRightPower);
         backRightMotor.setPower(backRightPower);
+    }
+
+    public void moveInDirection(Vector2 inputDirection, float inputRotation, float speed, IMU imu, long milliseconds) {
+        moveInDirection(inputDirection, inputRotation, speed, imu);
+
+        float startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < milliseconds) {
+            //do nothing
+        }
+        stopMovement();
     }
 
     private Vector2 getFieldPosition(IMU imu) {

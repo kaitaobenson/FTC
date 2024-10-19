@@ -1,12 +1,9 @@
-package Opmodes;
+package Opmodes.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import Components.Drive;
 import Components.Intake;
@@ -37,11 +34,14 @@ public class Main extends LinearOpMode {
 
         // Program loop
         while (opModeIsActive() && !isStopRequested()) {
-
             // Drive
             Vector2 driveDirection = new Vector2(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-            float driveRotation = gamepad1.right_stick_x;
-            drive.moveInDirection(driveDirection, driveRotation, 1, imu);
+            float driveRotation = (gamepad1.left_bumper ? -1 : 0) + (gamepad1.right_bumper ? 1 : 0);
+            drive.moveInDirection(driveDirection, driveRotation, 0.7f, imu);
+
+            Vector2 preciseDirection = new Vector2(gamepad2.left_stick_x, -gamepad2.left_stick_y);
+            float preciseRotation = gamepad2.right_stick_x;
+            drive.moveInDirection(preciseDirection, preciseRotation, 0.1f, imu);
 
             // Slides
             float slidesPower = -gamepad2.left_stick_y;
@@ -49,12 +49,13 @@ public class Main extends LinearOpMode {
 
             // Intake
             float intakePower = 0.0f;
-            intakePower += gamepad2.a ? 0.5 : 0;
-            intakePower -= gamepad2.b ? 0.5 : 0;
+            intakePower += gamepad2.right_trigger > 0.5 ? 0.5 : 0;
+            intakePower += gamepad2.left_trigger > 0.5 ? -0.5 : 0;
             intake.moveIntake(intakePower);
 
             // Print to console
             telemetry.addData(":} ;[ HAHAHA: silly: ", 10);
+            telemetry.addData(":} ;[ HAHAHA: gat: ", 1000);
             telemetry.update();
         }
     }
