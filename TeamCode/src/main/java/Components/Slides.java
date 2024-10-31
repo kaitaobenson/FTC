@@ -11,8 +11,8 @@ public class Slides {
 
     public DcMotor slideMotor = null;
 
-    public Slides(HardwareMap hardwareMap) {
-        slideMotor = hardwareMap.dcMotor.get("slideMotor");
+    public Slides(DcMotor slideMotor) {
+        this.slideMotor = slideMotor;
     }
 
     public void moveSlides(double power) {

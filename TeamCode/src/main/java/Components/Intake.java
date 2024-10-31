@@ -9,8 +9,8 @@ public class Intake {
     }
     public DcMotor intakeMotor = null;
 
-    public Intake(HardwareMap hardwareMap) {
-        intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
+    public Intake(DcMotor intakeMotor) {
+        this.intakeMotor = intakeMotor;
     }
 
     public void moveIntake(float power) {
