@@ -38,22 +38,39 @@ public class Drive {
 
     // speed is from 0 to 1
     public void moveInDirection(Vector2 direction, float rotation, float speed) {
-        double x = direction.x * 1.1;
-        double y = direction.y;
+        float rx = rotation * speed;
 
-        double rx = rotation * speed;
+        double power = Math.hypot(direction.x, direction.y);
+        double inputAngle = Math.atan2(direction.y, direction.x);
 
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        double frontLeftPower = (y + x + rx) / denominator * speed;
-        double backLeftPower = (y - x + rx) / denominator * speed;
-        double frontRightPower = (y - x - rx) / denominator * speed;
-        double backRightPower = (y + x - rx) / denominator * speed;
+        double cos = Math.cos(inputAngle - Math.PI / 4);
+        double sin = Math.sin(inputAngle - Math.PI / 4);
 
-        frontLeftMotor.setPower(frontLeftPower);
-        backLeftMotor.setPower(backLeftPower);
-        frontRightMotor.setPower(frontRightPower);
-        backRightMotor.setPower(backRightPower);
+        double frontLeftPower = cos * power + rx;
+        double backLeftPower = sin * power + rx;
+        double frontRightPower = sin * power - rx;
+        double backRightPower = cos * power - rx;
+
+        // Normalize motor powers
+        double maxPower = Math.max(Math.abs(frontLeftPower),
+                Math.max(Math.abs(backLeftPower),
+                        Math.max(Math.abs(frontRightPower), Math.abs(backRightPower))));
+
+        if (maxPower > 1.0) {
+            frontLeftPower /= maxPower;
+            backLeftPower /= maxPower;
+            frontRightPower /= maxPower;
+            backRightPower /= maxPower;
+        }
+
+        // Set motor powers
+        frontLeftMotor.setPower(frontLeftPower * speed);
+        backLeftMotor.setPower(backLeftPower * speed);
+        frontRightMotor.setPower(frontRightPower * speed);
+        backRightMotor.setPower(backRightPower * speed);
     }
+
+
 
     public void moveInDirection(Vector2 direction, float rotation, float speed, long milliseconds) {
         moveInDirection(direction, rotation, speed);

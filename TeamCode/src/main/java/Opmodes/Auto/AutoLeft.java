@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import Components.Drive;
 import Util.Vector2;
 
-@Autonomous(name = "Skib", group = "Test")
-public class TestAuto extends OpMode {
+@Autonomous(name = "Left", group = "Auto")
+public class AutoLeft extends OpMode {
 
     IMU imu;
 
@@ -34,6 +34,7 @@ public class TestAuto extends OpMode {
         drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
 
         drive.moveInDirection(new Vector2(0, 1), 0.0f, 0.5f, 100);
+        drive.moveInDirection(new Vector2(1, 0), 0.0f, 0.5f, 400);
     }
 
     @Override

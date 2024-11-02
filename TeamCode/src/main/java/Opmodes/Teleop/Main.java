@@ -70,11 +70,16 @@ public class Main extends OpMode {
         drive.moveInDirection(driveDirection, driveRotation, 1.0f);
 
         Vector2 preciseDirection = new Vector2(gamepad2.left_stick_x, -gamepad2.left_stick_y);
-        float preciseRotation = gamepad2.right_stick_x;
-        drive.moveInDirection(preciseDirection, preciseRotation, 0.2f);
+        float preciseRotation = gamepad2.right_stick_x * 3.0f;
+        drive.moveInDirection(preciseDirection, preciseRotation, 0.35f);
+
+        // Reset rotation
+        if (gamepad1.options) {
+            imu.resetYaw();
+        }
 
         // Slides
-        float slidesPower = -gamepad2.right_stick_y;
+        float slidesPower = (gamepad2.left_trigger - gamepad2.right_trigger) * 0.5f;
         slides.moveSlides(slidesPower);
 
         // Intake
@@ -92,11 +97,11 @@ public class Main extends OpMode {
         }
         else {
             hang.stop();
-            hang.equalizeMotors();
         }
 
-        servo_pos += gamepad2.right_stick_y / 100;
-        hang.leftServo.setPosition(0.5);
+        if (gamepad2.b) {
+            hang.armsUp();
+        }
 
         /*
         telemetry.addData("Drive: Front Left Motor", drive.frontLeftMotor.getPower());

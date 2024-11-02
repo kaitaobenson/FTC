@@ -21,19 +21,12 @@ public class Hang {
 
         leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
     }
 
     public void armsUp() {
-        this.rightServo.setPosition(0.45);
-    }
-
-    public void equalizeMotors() {
-        if (rightMotor.getCurrentPosition() < leftMotor.getCurrentPosition()) {
-            rightMotor.setPower(1);
-        }
-        else if (rightMotor.getCurrentPosition() > leftMotor.getCurrentPosition()) {
-            rightMotor.setPower(-1);
-        }
+        this.leftServo.setPosition(1);
+        this.rightServo.setPosition(0.4);
     }
 
     public void goUp(double power) {
