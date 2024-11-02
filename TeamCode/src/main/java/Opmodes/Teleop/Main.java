@@ -21,6 +21,7 @@ public class Main extends OpMode {
     Hang hang;
     Intake intake;
     Slides slides;
+    double servo_pos = 0;
 
     @Override
     public void init() {
@@ -42,10 +43,10 @@ public class Main extends OpMode {
         drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
 
         // Intake config
-        DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
-        Servo intakeTiltServo = hardwareMap.servo.get("intakeTiltServo");
+        //DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
+        //Servo intakeTiltServo = hardwareMap.servo.get("intakeTiltServo");
 
-        intake = new Intake(intakeMotor);
+        //intake = new Intake(intakeMotor);
 
         // Slides config
         DcMotor slideMotor = hardwareMap.dcMotor.get("slideMotor");
@@ -55,6 +56,10 @@ public class Main extends OpMode {
         // Hang config
         DcMotor leftHangMotor = hardwareMap.dcMotor.get("leftHangMotor");
         DcMotor rightHangMotor = hardwareMap.dcMotor.get("rightHangMotor");
+        Servo leftHangServo = hardwareMap.servo.get("leftHangServo");
+        Servo rightHangServo = hardwareMap.servo.get("rightHangServo");
+
+        hang = new Hang(leftHangMotor, rightHangMotor, leftHangServo, rightHangServo);
     }
 
     @Override
@@ -69,19 +74,29 @@ public class Main extends OpMode {
         drive.moveInDirection(preciseDirection, preciseRotation, 0.2f);
 
         // Slides
-        float slidesPower = -gamepad2.left_stick_y;
+        float slidesPower = -gamepad2.right_stick_y;
         slides.moveSlides(slidesPower);
 
         // Intake
-        float intakePower = 0.0f;
-        intakePower += gamepad2.right_trigger > 0.8 ? 0.5 : 0;
-        intakePower += gamepad2.left_trigger > 0.8 ? -0.5 : 0;
-        intake.moveIntake(intakePower);
+        //float intakePower = 0.0f;
+        //intakePower += gamepad2.right_trigger > 0.8 ? 0.5 : 0;
+        //intakePower += gamepad2.left_trigger > 0.8 ? -0.5 : 0;
+        //intake.moveIntake(intakePower);
 
         // Hang
-        float hangPower = 0.0f;
+        if (gamepad2.dpad_up) {
+            hang.goUp(1);
+        }
+        if (gamepad2.dpad_down) {
+            hang.goDown(1);
+        }
+        else {
+            hang.stop();
+            hang.equalizeMotors();
+        }
 
-
+        servo_pos += gamepad2.right_stick_y / 100;
+        hang.leftServo.setPosition(0.5);
 
         /*
         telemetry.addData("Drive: Front Left Motor", drive.frontLeftMotor.getPower());
@@ -89,6 +104,10 @@ public class Main extends OpMode {
         telemetry.addData("Drive: Back Left Motor", drive.backLeftMotor.getPower());
         telemetry.addData("Drive: Back Right Motor", drive.backRightMotor.getPower());
          */
+
+        telemetry.addData("Hang: Left Hang Servo", hang.leftServo.getPosition());
+        telemetry.addData("Hang: Right Hang Servo", hang.rightServo.getPosition());
+        telemetry.addData("Supposed servo pos", servo_pos);
 
         telemetry.update();
     }

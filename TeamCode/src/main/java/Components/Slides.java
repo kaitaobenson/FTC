@@ -16,6 +16,7 @@ public class Slides {
     }
 
     public void moveSlides(double power) {
+        slideMotor.setPower(power);
         if ((slideMotor.getCurrentPosition() < minSlideTicks && power < 0) ||
                 (slideMotor.getCurrentPosition() > maxSlideTicks && power > 0)) {
             slideMotor.setPower(power);
