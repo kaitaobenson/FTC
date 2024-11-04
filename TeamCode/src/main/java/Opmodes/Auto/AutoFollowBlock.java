@@ -42,7 +42,7 @@ public class AutoFollowBlock extends OpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+        drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, imu);
         followBlock = new FollowBlock("Webcam", FtcDashboard.getInstance().getTelemetry(), hardwareMap);
     }
 

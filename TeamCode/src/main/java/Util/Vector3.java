@@ -19,6 +19,10 @@ public class Vector3 {
         this.z = from.z;
     }
 
+    public static String toString(Vector3 from) {
+        return "(" + Double.toString(from.x) + ", " + Double.toString(from.y) + ", " + Double.toString(from.z) + ")";
+    }
+
     public boolean equals(Vector3 a) {
         return this.x == a.x && this.y == a.y && this.z == a.z;
     }

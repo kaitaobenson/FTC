@@ -31,7 +31,7 @@ public class AutoLeft extends OpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+        drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, imu);
 
         drive.moveInDirection(new Vector2(0, 1), 0.0f, 0.5f, 100);
         drive.moveInDirection(new Vector2(1, 0), 0.0f, 0.5f, 400);

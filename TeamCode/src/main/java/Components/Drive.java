@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import Util.Vector2;
 
@@ -16,17 +18,30 @@ public class Drive {
     public DcMotor backLeftMotor = null;
     public DcMotor backRightMotor = null;
 
-    public Drive(DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor) {
+    private boolean lockRotation = false;
+    private double startRotation = 0;
+    private IMU imu;
+
+    public Drive(DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, IMU imu) {
         this.frontLeftMotor = frontLeftMotor;
         this.frontRightMotor = frontRightMotor;
         this.backLeftMotor = backLeftMotor;
         this.backRightMotor = backRightMotor;
+        this.imu = imu;
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         backLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
+    public double getCurrentRotation() {
+        return imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle;
+    }
+
+    public double getCurrentRotationRadians() {
+        return imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
     }
 
     public void stopMovement() {
@@ -36,9 +51,28 @@ public class Drive {
         backRightMotor.setPower(0);
     }
 
+    public void lockRotation() {
+        lockRotation = true;
+        startRotation = getCurrentRotationRadians();
+    }
+
+    public void unlockRotation() {
+        lockRotation = false;
+    }
+
     // speed is from 0 to 1
     public void moveInDirection(Vector2 direction, float rotation, float speed) {
         float rx = rotation * speed;
+
+        if (lockRotation) {
+            double currentRotation = getCurrentRotationRadians();
+            if (currentRotation < startRotation - 0.2) {
+                rx = -0.05f;
+            }
+            if (currentRotation > startRotation + 0.2) {
+                rx = 0.05f;
+            }
+        }
 
         double power = Math.hypot(direction.x, direction.y);
         double inputAngle = Math.atan2(direction.y, direction.x);
@@ -69,8 +103,6 @@ public class Drive {
         frontRightMotor.setPower(frontRightPower * speed);
         backRightMotor.setPower(backRightPower * speed);
     }
-
-
 
     public void moveInDirection(Vector2 direction, float rotation, float speed, long milliseconds) {
         moveInDirection(direction, rotation, speed);

@@ -31,7 +31,7 @@ public class AutoRight extends OpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+        drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, imu);
 
         // Lil bro so the plan is to stop it when it gets into the zone lil bro
         drive.moveInDirection(new Vector2(1, 0), 0.0f, 0.5f, 1000000);

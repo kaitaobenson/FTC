@@ -1,7 +1,5 @@
 package Components;
 
-import android.sax.StartElementListener;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -12,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -21,7 +18,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 
 import Opmodes.Auto.Pipelines.AprilTagDetectionPipeline;
-import Util.Vector3;
+import Util.Vector2;
 
 @Config
 public class AprilTagCompute {
@@ -88,38 +85,14 @@ public class AprilTagCompute {
             telemetry.addData("Overhead ms", camera.getOverheadTimeMs());
             telemetry.addData("Pipeline ms", camera.getPipelineTimeMs());
 
-            if (detections.size() == 0)
-            {
+            if (detections.size() == 0) {
                 numFramesWithoutDetection++;
 
-                if (numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION) {
-                    pipeline.setDecimation(DECIMATION_LOW);
-                }
+                if (numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION) { pipeline.setDecimation(DECIMATION_LOW); }
             }
-            else
-            {
+            else {
                 numFramesWithoutDetection = 0;
-
-                if (detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS)
-                {
-                    pipeline.setDecimation(DECIMATION_HIGH);
-                }
-
-                for (AprilTagDetection detection : detections)
-                {
-                    Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
-
-                    telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-                    telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-                    telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-                    telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
-                    telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
-                    telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
-                    telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
-
-                    Vector3 position = new Vector3(detection.pose.x, detection.pose.y, detection.pose.z).multiply(FEET_PER_METER);
-                    position.rotate(rot.firstAngle, rot.secondAngle);
-                }
+                if (detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS) { pipeline.setDecimation(DECIMATION_HIGH); }
             }
 
             telemetry.update();
@@ -130,5 +103,40 @@ public class AprilTagCompute {
         }
 
         return detections;
+    }
+
+    public Vector2 getRobotPosition(ArrayList<AprilTagDetection> detections) {
+        AprilTagDetection detection = detections.get(0);
+
+        Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+
+        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
+        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
+        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
+
+        Vector2 aprilTagPosition = new Vector2(detection.pose.x, detection.pose.z);
+        double aprilTagDistance = aprilTagPosition.distanceTo(new Vector2(0, 0)); // Camera is the origin.
+
+        // Ask me about this math if you want, but this is the camera position relative
+        // to the april tag.
+        double C = Math.toRadians(rot.firstAngle);
+        double A = Math.atan(aprilTagPosition.x / aprilTagPosition.y);
+        double D = 90 - C;
+        double cameraPositionZ = aprilTagDistance * Math.sin(D);
+        double cameraPositionX = aprilTagDistance * Math.sin(A + C);
+        Vector2 cameraPosition = new Vector2(-cameraPositionX, cameraPositionZ);
+
+        telemetry.addData("April Tag Distance (feet)", aprilTagDistance * FEET_PER_METER);
+        telemetry.addData("Camera Position Relative to April Tag (feet)", Vector2.toString(cameraPosition.multiply(FEET_PER_METER)));
+
+        return cameraPosition;
+    }
+
+    public double getRobotRotation(ArrayList<AprilTagDetection> detections) {
+        return Orientation.getOrientation(detections.get(0).pose.R, AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).firstAngle;
     }
 }

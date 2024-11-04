@@ -40,7 +40,7 @@ public class Main extends OpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+        drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, imu);
 
         // Intake config
         //DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
