@@ -1,4 +1,4 @@
-package Opmodes.Auto;
+package Opmodes.Auto.Pipelines;
 
 import com.acmerobotics.dashboard.config.Config;
 
@@ -21,7 +21,9 @@ public class EdgeDetectionProcessPipeline extends OpenCvPipeline {
     public static int blurWidth = 5;
     public static int blurHeight = 3;
     public static int heightOffset = 0;
+    public static int cameraOffset = 10;
     public float center;
+    public boolean notFound;
 
     @Override
     public Mat processFrame(Mat input) {
@@ -50,13 +52,17 @@ public class EdgeDetectionProcessPipeline extends OpenCvPipeline {
 
         if (positions.size() == 0) {
             center = 0.5f;
+            notFound = true;
             return out;
+        }
+        else {
+            notFound = false;
         }
 
         IntStream thingy = positions.stream().mapToInt(Integer::intValue);
         float average = (float)thingy.sum() / (float)positions.size();
 
-        center = average - input.width() / 2.0f; // Offset so its relative to the center of the robot.
+        center = average - input.width() / 2.0f + cameraOffset; // Offset so its relative to the center of the robot.
 
         return out;
 

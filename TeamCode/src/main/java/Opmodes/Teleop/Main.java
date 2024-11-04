@@ -65,11 +65,11 @@ public class Main extends OpMode {
     @Override
     public void loop() {
         // Drive
-        Vector2 driveDirection = new Vector2(gamepad1.left_stick_x, -gamepad1.left_stick_y);
+        Vector2 driveDirection = new Vector2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
         float driveRotation = gamepad1.right_stick_x;
         drive.moveInDirection(driveDirection, driveRotation, 1.0f);
 
-        Vector2 preciseDirection = new Vector2(gamepad2.left_stick_x, -gamepad2.left_stick_y);
+        Vector2 preciseDirection = new Vector2(-gamepad2.left_stick_y, gamepad2.left_stick_x);
         float preciseRotation = gamepad2.right_stick_x * 3.0f;
         drive.moveInDirection(preciseDirection, preciseRotation, 0.35f);
 
@@ -101,6 +101,9 @@ public class Main extends OpMode {
 
         if (gamepad2.b) {
             hang.armsUp();
+        }
+        else {
+            hang.turnOff();
         }
 
         /*

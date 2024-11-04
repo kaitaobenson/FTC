@@ -7,26 +7,27 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 import Components.Drive;
-import Util.Vector2;
+import Components.FollowBlock;
+import Opmodes.Auto.Pipelines.EdgeDetectionProcessPipeline;
 
-@Autonomous(name = "AutoFollowBlock", group = "Auto")
+@Autonomous(name = "AutoFollowBlock", group = "Demo")
 public class AutoFollowBlock extends OpMode {
 
     IMU imu;
     Drive drive;
-    OpenCvWebcam webcam;
     EdgeDetectionProcessPipeline pipeline;
+    FollowBlock followBlock;
+    double startRotation;
 
     @Override
     public void init() {
-        IMU imu = hardwareMap.get(IMU.class, "imu");
+        imu = hardwareMap.get(IMU.class, "imu");
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
@@ -34,60 +35,38 @@ public class AutoFollowBlock extends OpMode {
 
         imu.initialize(parameters);
 
+        startRotation = imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+
         DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
         drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-
-        // Webcam tests
-        String packageName = hardwareMap.appContext.getPackageName();
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", packageName);
-
-        pipeline = new EdgeDetectionProcessPipeline();
-
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
-        webcam.setPipeline(pipeline);
-        webcam.setMillisecondsPermissionTimeout(5000);
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-            }
-
-            @Override
-            public void onError(int errorCode) {
-                telemetry.addLine("Error: " + errorCode);
-            }
-        });
-
-        FtcDashboard.getInstance().startCameraStream(webcam, 0);
-
-        telemetry.addLine("Waiting for start");
-        telemetry.update();
+        followBlock = new FollowBlock("Webcam", FtcDashboard.getInstance().getTelemetry(), hardwareMap);
     }
 
     @Override
     public void loop() {
         // We probably don't need all this debug.
-        telemetry.addData("Frame Count", webcam.getFrameCount());
-        telemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
-        telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
-        telemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
-        telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
-        telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
-        telemetry.addData("Center Offset", pipeline.center);
+        telemetry.addData("Frame Count", followBlock.webcam.getFrameCount());
+        telemetry.addData("FPS", String.format("%.2f", followBlock.webcam.getFps()));
+        telemetry.addData("Total frame time ms", followBlock.webcam.getTotalFrameTimeMs());
+        telemetry.addData("Pipeline time ms", followBlock.webcam.getPipelineTimeMs());
+        telemetry.addData("Overhead time ms", followBlock.webcam.getOverheadTimeMs());
+        telemetry.addData("Theoretical max FPS", followBlock.webcam.getCurrentPipelineMaxFps());
         telemetry.update();
 
-        if (pipeline.center < -5) {
-            drive.moveInDirection(new Vector2(-1, 0), 0, 0.4f);
+        float currentRotation = imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+
+        float rotationCorrection = 0;
+        if (currentRotation < startRotation - 0.2) {
+            rotationCorrection = -0.05f;
         }
-        else if (pipeline.center > 5) {
-            drive.moveInDirection(new Vector2(1, 0), 0, 0.4f);
+        if (currentRotation > startRotation + 0.2) {
+            rotationCorrection = 0.05f;
         }
-        else {
-            drive.moveInDirection(new Vector2(0, 0), 0, 0.4f);
-        }
+
+        drive.moveInDirection(followBlock.getMovementDirection(), rotationCorrection, 1f);
     }
 }

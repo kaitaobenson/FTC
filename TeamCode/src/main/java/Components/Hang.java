@@ -1,17 +1,21 @@
 package Components;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import Util.Vector2;
 
+@Config
 public class Hang {
 
     public DcMotor leftMotor = null;
     public DcMotor rightMotor = null;
     public Servo leftServo = null;
     public Servo rightServo = null;
+
+    public static double movementskibidi = -1;
 
     public Hang(DcMotor leftMotor, DcMotor rightMotor, Servo leftServo, Servo rightServo) {
         this.leftMotor = leftMotor;
@@ -25,8 +29,12 @@ public class Hang {
     }
 
     public void armsUp() {
-        this.leftServo.setPosition(1);
-        this.rightServo.setPosition(0.4);
+        this.leftServo.setPosition(-1);
+        this.rightServo.setPosition(1);
+    }
+
+    public void turnOff() {
+        this.rightServo.setPosition(0.5);
     }
 
     public void goUp(double power) {

@@ -47,8 +47,8 @@ public class Drive {
         double sin = Math.sin(inputAngle - Math.PI / 4);
 
         double frontLeftPower = cos * power + rx;
-        double backLeftPower = sin * power + rx;
-        double frontRightPower = sin * power - rx;
+        double backLeftPower = sin * power - rx;
+        double frontRightPower = sin * -power - rx;
         double backRightPower = cos * power - rx;
 
         // Normalize motor powers
