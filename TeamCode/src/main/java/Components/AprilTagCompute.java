@@ -49,6 +49,7 @@ public class AprilTagCompute {
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
 
     public boolean lastFoundValidAprilTag;
+    public int lastValidAprilTagDirection = 0;
 
     Telemetry telemetry;
 
@@ -93,6 +94,8 @@ public class AprilTagCompute {
             else {
                 numFramesWithoutDetection = 0;
                 if (detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS) { pipeline.setDecimation(DECIMATION_HIGH); }
+
+                lastValidAprilTagDirection = getRobotPosition(detections).x > 0 ? -1 : 1;
             }
 
             telemetry.update();
@@ -112,11 +115,8 @@ public class AprilTagCompute {
 
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
         telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
-        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
-        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
 
         Vector2 aprilTagPosition = new Vector2(detection.pose.x, detection.pose.z);
         double aprilTagDistance = aprilTagPosition.distanceTo(new Vector2(0, 0)); // Camera is the origin.
@@ -124,14 +124,14 @@ public class AprilTagCompute {
         // Ask me about this math if you want, but this is the camera position relative
         // to the april tag.
         double C = Math.toRadians(rot.firstAngle);
-        double A = Math.atan(aprilTagPosition.x / aprilTagPosition.y);
-        double D = 90 - C;
+        double A = Math.atan(Math.abs(aprilTagPosition.x) / Math.abs(aprilTagPosition.y));
+        double D = Math.PI / 2 - C;
         double cameraPositionZ = aprilTagDistance * Math.sin(D);
-        double cameraPositionX = aprilTagDistance * Math.sin(A + C);
-        Vector2 cameraPosition = new Vector2(-cameraPositionX, cameraPositionZ);
+        double cameraPositionX = aprilTagDistance * Math.sin(A + C) * (C < 0 ? -1 : 1);
+        Vector2 cameraPosition = new Vector2(cameraPositionX, cameraPositionZ);
 
-        telemetry.addData("April Tag Distance (feet)", aprilTagDistance * FEET_PER_METER);
-        telemetry.addData("Camera Position Relative to April Tag (feet)", Vector2.toString(cameraPosition.multiply(FEET_PER_METER)));
+        telemetry.addData("April Tag Distance", aprilTagDistance);
+        telemetry.addData("Camera Position Relative to April Tag", Vector2.toString(cameraPosition));
 
         return cameraPosition;
     }

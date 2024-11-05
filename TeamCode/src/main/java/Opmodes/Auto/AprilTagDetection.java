@@ -8,7 +8,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Vector;
 
 import Components.AprilTagCompute;
@@ -25,6 +28,11 @@ public class AprilTagDetection extends OpMode {
 
     public static float minDistConsideredReached = 0.1f;
     public static float fullMovementMultiplier = 1;
+
+    public boolean targetReached = false;
+    public Vector2 targetPosition = new Vector2(0, 0.5);
+
+    private Vector2 movementDirection = new Vector2(0, 0);
 
     @Override
     public void init() {
@@ -44,7 +52,9 @@ public class AprilTagDetection extends OpMode {
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
         drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, imu);
-        drive.lockRotation();
+        drive.useFieldDirections = true;
+
+        imu.resetYaw();
 
         compute = new AprilTagCompute(hardwareMap, telemetry);
     }
@@ -58,8 +68,10 @@ public class AprilTagDetection extends OpMode {
         if (detections == null || detections.isEmpty()) {
             timesLostAprilTag++;
 
-            if (timesLostAprilTag > 100) {
-                drive.moveInDirection(new Vector2(0, 0), 0, 0);
+            // The April tag has probably gone out of view.
+            if (timesLostAprilTag > 200) {
+                telemetry.addData("Last Valid April Tag Direction", compute.lastValidAprilTagDirection);
+                drive.moveInDirection(new Vector2(0, 0), compute.lastValidAprilTagDirection * 0.3f, 0.3f);
             }
 
             return;
@@ -68,25 +80,34 @@ public class AprilTagDetection extends OpMode {
         timesLostAprilTag = 0;
 
         Vector2 robotPosition = compute.getRobotPosition(detections);
-        double robotRotation = compute.getRobotRotation(detections);
 
         // Example code
-        Vector2 targetPosition = new Vector2(0, 0.5);
-        double targetRotation = 0;
-
         double distToTargetPosition = robotPosition.distanceTo(targetPosition);
 
         telemetry.addData("Distance to target position", distToTargetPosition);
+        telemetry.addData("IMU Angle", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
 
         if (distToTargetPosition < minDistConsideredReached) {
+            targetReached = true;
+
+            if (targetPosition.equals(new Vector2(0, 0.5))) {
+                targetPosition = new Vector2(0.25, 0.8);
+            }
+            else {
+                targetPosition = new Vector2(0, 0.5);
+            }
+
             return;
         }
 
-        Vector2 movementDirection = targetPosition.subtract(robotPosition).normalized();
+        Vector2 targetMovementDirection = targetPosition.subtract(robotPosition).normalized();
+
+        movementDirection = movementDirection.add(targetMovementDirection.subtract(movementDirection).multiply(0.25));
 
         double speedMultiplier = Math.min(Math.max(fullMovementMultiplier * distToTargetPosition * 2, 0.2f), 1f);
-        drive.moveInDirection(new Vector2(-movementDirection.y, movementDirection.x), 0, (float)speedMultiplier);
+        drive.moveInDirection(new Vector2(-movementDirection.y, -movementDirection.x), 0, (float)speedMultiplier);
 
         telemetry.addData("Movement Direction", Vector2.toString(movementDirection));
+        telemetry.addData("Target Position", Vector2.toString(targetPosition));
     }
 }

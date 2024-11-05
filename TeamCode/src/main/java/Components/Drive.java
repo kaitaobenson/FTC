@@ -17,6 +17,7 @@ public class Drive {
     public DcMotor frontRightMotor = null;
     public DcMotor backLeftMotor = null;
     public DcMotor backRightMotor = null;
+    public boolean useFieldDirections = false;
 
     private boolean lockRotation = false;
     private double startRotation = 0;
@@ -60,6 +61,10 @@ public class Drive {
         lockRotation = false;
     }
 
+    public void zeroRotation() {
+        imu.resetYaw();
+    }
+
     // speed is from 0 to 1
     public void moveInDirection(Vector2 direction, float rotation, float speed) {
         float rx = rotation * speed;
@@ -74,16 +79,18 @@ public class Drive {
             }
         }
 
+        double fieldRotation = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
         double power = Math.hypot(direction.x, direction.y);
-        double inputAngle = Math.atan2(direction.y, direction.x);
+        double inputAngle = Math.atan2(direction.y, direction.x) - (useFieldDirections ? fieldRotation : 0);
 
         double cos = Math.cos(inputAngle - Math.PI / 4);
         double sin = Math.sin(inputAngle - Math.PI / 4);
 
-        double frontLeftPower = cos * power + rx;
-        double backLeftPower = sin * power - rx;
-        double frontRightPower = sin * -power - rx;
-        double backRightPower = cos * power - rx;
+        double frontLeftPower = cos * power * speed + rx;
+        double backLeftPower = sin * power * speed - rx;
+        double frontRightPower = sin * -power * speed - rx;
+        double backRightPower = cos * power * speed - rx;
 
         // Normalize motor powers
         double maxPower = Math.max(Math.abs(frontLeftPower),
@@ -98,10 +105,10 @@ public class Drive {
         }
 
         // Set motor powers
-        frontLeftMotor.setPower(frontLeftPower * speed);
-        backLeftMotor.setPower(backLeftPower * speed);
-        frontRightMotor.setPower(frontRightPower * speed);
-        backRightMotor.setPower(backRightPower * speed);
+        frontLeftMotor.setPower(frontLeftPower);
+        backLeftMotor.setPower(backLeftPower);
+        frontRightMotor.setPower(frontRightPower);
+        backRightMotor.setPower(backRightPower);
     }
 
     public void moveInDirection(Vector2 direction, float rotation, float speed, long milliseconds) {
