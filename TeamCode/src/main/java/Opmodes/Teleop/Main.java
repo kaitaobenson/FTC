@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import Components.Arm;
 import Components.Drive;
 import Components.Hang;
 import Components.Intake;
@@ -21,6 +22,7 @@ public class Main extends OpMode {
     Hang hang;
     Intake intake;
     Slides slides;
+    Arm arm;
     double servo_pos = 0;
 
     @Override
@@ -35,10 +37,10 @@ public class Main extends OpMode {
         imu.initialize(parameters);
 
         // Drive config
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("leftFront");
+        DcMotor frontRightMotor = hardwareMap.dcMotor.get("rightFront");
+        DcMotor backLeftMotor = hardwareMap.dcMotor.get("leftRear");
+        DcMotor backRightMotor = hardwareMap.dcMotor.get("rightRear");
 
         drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, imu);
 
@@ -60,6 +62,10 @@ public class Main extends OpMode {
         Servo rightHangServo = hardwareMap.servo.get("rightHangServo");
 
         hang = new Hang(leftHangMotor, rightHangMotor, leftHangServo, rightHangServo);
+
+        Servo armServo = hardwareMap.servo.get("armServo");
+
+        arm = new Arm(armServo);
     }
 
     @Override
@@ -112,6 +118,8 @@ public class Main extends OpMode {
         telemetry.addData("Drive: Back Left Motor", drive.backLeftMotor.getPower());
         telemetry.addData("Drive: Back Right Motor", drive.backRightMotor.getPower());
          */
+
+        arm.debugPosition(telemetry);
 
         telemetry.addData("Hang: Left Hang Servo", hang.leftServo.getPosition());
         telemetry.addData("Hang: Right Hang Servo", hang.rightServo.getPosition());
