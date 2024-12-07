@@ -22,4 +22,12 @@ public class Slides {
             slideMotor.setPower(power);
         }
     }
+
+    public boolean isAtTop() {
+        return slideMotor.getCurrentPosition() > maxSlideTicks;
+    }
+
+    public boolean isAtBottom() {
+        return slideMotor.getCurrentPosition() < minSlideTicks;
+    }
 }

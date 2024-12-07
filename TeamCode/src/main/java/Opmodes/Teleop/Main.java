@@ -51,7 +51,7 @@ public class Main extends OpMode {
         //intake = new Intake(intakeMotor);
 
         // Slides config
-        DcMotor slideMotor = hardwareMap.dcMotor.get("slideMotor");
+        DcMotor slideMotor = hardwareMap.dcMotor.get("rightHangMotor");
 
         slides = new Slides(slideMotor);
 
@@ -64,8 +64,9 @@ public class Main extends OpMode {
         hang = new Hang(leftHangMotor, rightHangMotor, leftHangServo, rightHangServo);
 
         Servo armServo = hardwareMap.servo.get("armServo");
+        Servo clawServo = hardwareMap.servo.get("clawServo");
 
-        arm = new Arm(armServo);
+        arm = new Arm(armServo, clawServo);
     }
 
     @Override
@@ -119,6 +120,13 @@ public class Main extends OpMode {
         telemetry.addData("Drive: Back Right Motor", drive.backRightMotor.getPower());
          */
 
+        if (gamepad1.b) {
+            arm.openClaw();
+        }
+        if (gamepad1.a) {
+            arm.closeClaw();
+        }
+        arm.setArmPosition(0.5);
         arm.debugPosition(telemetry);
 
         telemetry.addData("Hang: Left Hang Servo", hang.leftServo.getPosition());
