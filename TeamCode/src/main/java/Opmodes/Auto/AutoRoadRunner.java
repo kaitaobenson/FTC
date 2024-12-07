@@ -56,6 +56,7 @@ public class AutoRoadRunner extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(1)
                 .waitSeconds(2)
+                .addDisplacementMarker(() -> {arm.openClaw();})
                 .back(1)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.LOWERING_SLIDES;})
                 .strafeRight(1)
