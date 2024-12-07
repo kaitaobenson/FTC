@@ -57,7 +57,7 @@ public class Main extends OpMode {
 
         // Hang config
         DcMotor leftHangMotor = hardwareMap.dcMotor.get("leftHangMotor");
-        DcMotor rightHangMotor = hardwareMap.dcMotor.get("rightHangMotor");
+        DcMotor rightHangMotor = hardwareMap.dcMotor.get("parallelEncoder");
         Servo leftHangServo = hardwareMap.servo.get("leftHangServo");
         Servo rightHangServo = hardwareMap.servo.get("rightHangServo");
 
