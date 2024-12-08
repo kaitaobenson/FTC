@@ -5,8 +5,21 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Arm {
-    Servo armServo;
-    Servo clawServo;
+    public Servo armServo;
+    public Servo clawServo;
+
+    public enum ARM_STATE {
+        UP,
+        DOWN,
+        SLIGHTLY_OVER,
+    }
+    public ARM_STATE armState = ARM_STATE.UP;
+
+    public enum CLAW_STATE {
+        OPEN,
+        CLOSED,
+    }
+    public CLAW_STATE clawState = CLAW_STATE.CLOSED;
 
     public Arm(Servo armServo, Servo clawServo) {
         this.armServo = armServo;
@@ -14,27 +27,32 @@ public class Arm {
     }
 
     public void debugPosition(Telemetry telemetry) {
-        telemetry.addData("Debug arm position", armServo.getPosition());
-        telemetry.addData("Debug claw position", clawServo.getPosition());
+        telemetry.addData("ARM: Arm position", armServo.getPosition());
+        telemetry.addData("ARM: Claw position", clawServo.getPosition());
     }
 
     public void moveArmUp() {
-
+        armState = ARM_STATE.UP;
+        armServo.setPosition(0.87);
     }
 
     public void moveArmDown() {
-
+        armState = ARM_STATE.DOWN;
+        armServo.setPosition(0.55);
     }
 
     public void moveArmSlightlyOver() {
-
+        armState = ARM_STATE.SLIGHTLY_OVER;
+        armServo.setPosition(0.77);
     }
 
     public void openClaw() {
+        clawState = CLAW_STATE.OPEN;
         clawServo.setPosition(1);
     }
 
     public void closeClaw() {
+        clawState = CLAW_STATE.CLOSED;
         clawServo.setPosition(0.58);
     }
 

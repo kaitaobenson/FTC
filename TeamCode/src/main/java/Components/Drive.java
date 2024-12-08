@@ -79,7 +79,7 @@ public class Drive {
             }
         }
 
-        double fieldRotation = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double fieldRotation = imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS);
 
         double power = Math.hypot(direction.x, direction.y);
         double inputAngle = Math.atan2(direction.y, direction.x) - (useFieldDirections ? fieldRotation : 0);

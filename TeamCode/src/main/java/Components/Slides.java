@@ -30,4 +30,20 @@ public class Slides {
     public boolean isAtBottom() {
         return slideMotor.getCurrentPosition() < minSlideTicks;
     }
+
+    public boolean isAboveHighBar() {
+        return false;
+    }
+
+    public boolean isAboveHighBasket() {
+        return false;
+    }
+
+    public void moveTowardHighBar() {
+
+    }
+
+    public void moveTowardHighBasket() {
+
+    }
 }

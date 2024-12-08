@@ -8,6 +8,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import Components.Arm;
+import Components.ButtonHandler;
 import Components.Drive;
 import Components.Hang;
 import Components.Intake;
@@ -24,6 +25,8 @@ public class Main extends OpMode {
     Slides slides;
     Arm arm;
     double servo_pos = 0;
+
+    ButtonHandler clawButtonHandler;
 
     @Override
     public void init() {
@@ -51,7 +54,7 @@ public class Main extends OpMode {
         //intake = new Intake(intakeMotor);
 
         // Slides config
-        DcMotor slideMotor = hardwareMap.dcMotor.get("rightHangMotor");
+        DcMotor slideMotor = hardwareMap.dcMotor.get("slidesMotor");
 
         slides = new Slides(slideMotor);
 
@@ -67,6 +70,7 @@ public class Main extends OpMode {
         Servo clawServo = hardwareMap.servo.get("clawServo");
 
         arm = new Arm(armServo, clawServo);
+        clawButtonHandler = new ButtonHandler();
     }
 
     @Override
@@ -77,7 +81,7 @@ public class Main extends OpMode {
         drive.moveInDirection(driveDirection, driveRotation, 1.0f);
 
         Vector2 preciseDirection = new Vector2(-gamepad2.left_stick_y, gamepad2.left_stick_x);
-        float preciseRotation = gamepad2.right_stick_x * 3.0f;
+        float preciseRotation = gamepad2.right_stick_x * 0.6f;
         drive.moveInDirection(preciseDirection, preciseRotation, 0.35f);
 
         // Reset rotation
@@ -86,7 +90,7 @@ public class Main extends OpMode {
         }
 
         // Slides
-        float slidesPower = (gamepad2.left_trigger - gamepad2.right_trigger) * 0.5f;
+        float slidesPower = (gamepad2.right_trigger - gamepad2.left_trigger);
         slides.moveSlides(slidesPower);
 
         // Intake
@@ -120,15 +124,28 @@ public class Main extends OpMode {
         telemetry.addData("Drive: Back Right Motor", drive.backRightMotor.getPower());
          */
 
-        if (gamepad1.b) {
-            arm.openClaw();
+        clawButtonHandler.update(gamepad2.a);
+
+        if (clawButtonHandler.justPressed) {
+            if (arm.clawState == Arm.CLAW_STATE.OPEN) {
+                arm.closeClaw();
+            }
+            else if (arm.clawState == Arm.CLAW_STATE.CLOSED) {
+                arm.openClaw();
+            }
         }
-        if (gamepad1.a) {
-            arm.closeClaw();
+
+        if (gamepad2.left_bumper) {
+            arm.moveArmUp();
         }
-        arm.setArmPosition(0.5);
+        if (gamepad2.right_bumper) {
+            arm.moveArmDown();
+        }
+
+        arm.setArmPosition(arm.armServo.getPosition() - gamepad2.right_stick_y * 0.005);
         arm.debugPosition(telemetry);
 
+        telemetry.addData("Slides: Position", slides.slideMotor.getCurrentPosition());
         telemetry.addData("Hang: Left Hang Servo", hang.leftServo.getPosition());
         telemetry.addData("Hang: Right Hang Servo", hang.rightServo.getPosition());
         telemetry.addData("Supposed servo pos", servo_pos);
