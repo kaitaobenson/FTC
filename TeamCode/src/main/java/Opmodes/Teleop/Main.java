@@ -145,6 +145,8 @@ public class Main extends OpMode {
         arm.setArmPosition(arm.armServo.getPosition() - gamepad2.right_stick_y * 0.005);
         arm.debugPosition(telemetry);
 
+        telemetry.addData("Is above high bar", slides.isAboveHighBar());
+
         telemetry.addData("Slides: Position", slides.slideMotor.getCurrentPosition());
         telemetry.addData("Hang: Left Hang Servo", hang.leftServo.getPosition());
         telemetry.addData("Hang: Right Hang Servo", hang.rightServo.getPosition());

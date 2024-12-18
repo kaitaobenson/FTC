@@ -52,14 +52,10 @@ public class AutoRoadRunner extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(new Pose2d(0, -60, 1.5708));
         TrajectorySequence myTrajectory = drive.trajectorySequenceBuilder(new Pose2d(0, -60, 1.5708))
-                .forward(27)
-                .addTemporalMarker(0, () -> {state = STATE_ENUM.RAISING_SLIDES_TO_BAR;})
+                .addDisplacementMarker(() -> {state = STATE_ENUM.RAISING_SLIDES_TO_BAR;})
+                .forward(30)
                 .waitSeconds(1)
-                .forward(1)
-                .waitSeconds(2)
-                .addDisplacementMarker(() -> {arm.openClaw();})
-                .back(1)
-                .addDisplacementMarker(() -> {state = STATE_ENUM.LOWERING_SLIDES;})
+                .addDisplacementMarker(() -> {state = STATE_ENUM.ATTACHING_SPECIMEN;})
                 .strafeRight(1)
                 .splineTo(new Vector2d(48, -40), 0)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.LOWERING_ARM_TO_SPECIMEN;})
@@ -86,17 +82,19 @@ public class AutoRoadRunner extends LinearOpMode {
 
             if (state == STATE_ENUM.RAISING_SLIDES_TO_BAR) {
                 telemetry.addData("AUTO STATE", "Raising slides to bar");
-                if (slides.isAtTop()) {
-                    state = STATE_ENUM.ATTACHING_SPECIMEN;
+                telemetry.addData("above high bar", slides.isAboveHighBar());
+                if (!slides.isAboveHighBar()) {
+                    slides.moveTowardHighBar();
                 }
                 else {
-                    slides.moveSlides(-1);
+                    slides.moveSlides(0);
                 }
+
             }
             if (state == STATE_ENUM.ATTACHING_SPECIMEN) {
                 telemetry.addData("AUTO STATE", "Attaching specimen");
                 // Maybe move the arm forward if necessary.
-                slides.moveSlides(0.2);
+                slides.moveSlides(0.6);
             }
             if (state == STATE_ENUM.LOWERING_SLIDES) {
                 telemetry.addData("AUTO STATE", "Lowering slides");
@@ -106,6 +104,7 @@ public class AutoRoadRunner extends LinearOpMode {
             }
             if (state == STATE_ENUM.LOWERING_ARM_TO_SPECIMEN) {
                 telemetry.addData("AUTO STATE", "Lowering arm to specimen");
+                arm.openClaw();
                 arm.moveArmDown();
             }
             if (state == STATE_ENUM.GRABBING_SPECIMEN) {
