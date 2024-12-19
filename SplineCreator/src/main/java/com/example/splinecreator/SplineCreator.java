@@ -15,11 +15,8 @@ public class SplineCreator {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(30, 20, 22, 3, 11)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(0, -60, 1.5708))
-                        .forward(27)
+                        .forward(30)
                         .waitSeconds(1)
-                        .forward(1)
-                        .waitSeconds(2)
-                        .back(1)
                         .strafeRight(1)
                         .splineTo(new Vector2d(48, -40), 0)
                         .waitSeconds(1)
