@@ -70,7 +70,7 @@ public class AutoRoadRunner extends LinearOpMode {
                 .addDisplacementMarker(() -> {state = STATE_ENUM.RAISING_ARM_WITH_SPECIMEN;})
                 .turn(1.5708)
                 .forward(1)
-                .splineTo(new Vector2d(-57, -53), -2.35619449019)
+                .splineTo(new Vector2d(57, -53), -2.35619449019)
                 .addTemporalMarker(15, () -> {state = STATE_ENUM.RAISING_SLIDES_TO_BASKET;})
                 .addTemporalMarker(18.5, () -> {state = STATE_ENUM.DROPPING_SPECIMEN;})
                 .waitSeconds(3)

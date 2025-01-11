@@ -55,19 +55,18 @@ public class AutoLeft extends LinearOpMode {
                 .addDisplacementMarker(() -> {state = STATE_ENUM.RAISING_SLIDES_TO_BAR;})
                 .forward(23)
                 .strafeRight(24)
-                .forward(7)
+                .forward(5.4)
                 .waitSeconds(1.5)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.ATTACHING_SPECIMEN;})
-                .back(2)
                 .strafeLeft(1)
-                .splineTo(new Vector2d(-49, -39), 3.14)
+                .splineTo(new Vector2d(-46, -39), 3.14)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.LOWERING_ARM_TO_SPECIMEN;})
                 .forward(0.1)
-                .waitSeconds(0.6)
+                .waitSeconds(1)
                 .back(0.1)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.GRABBING_SPECIMEN;})
                 .forward(0.1)
-                .waitSeconds(0.4)
+                .waitSeconds(1)
                 .back(0.13)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.RAISING_ARM_WITH_SPECIMEN;})
                 .turn(1.5708)
@@ -78,12 +77,11 @@ public class AutoLeft extends LinearOpMode {
                 .waitSeconds(3)
                 .build();
 
-
         waitForStart();
 
         drive.followTrajectorySequenceAsync(myTrajectory);
         arm.closeClaw();
-        arm.moveArmUp();
+        arm.moveArmSlightlyOver();
 
         while (!isStopRequested()) {
             drive.update();
