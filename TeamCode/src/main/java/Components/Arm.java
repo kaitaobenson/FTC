@@ -43,7 +43,7 @@ public class Arm {
 
     public void moveArmSlightlyOver() {
         armState = ARM_STATE.SLIGHTLY_OVER;
-        armServo.setPosition(0.6);
+        armServo.setPosition(0.65);
     }
 
     public void openClaw() {

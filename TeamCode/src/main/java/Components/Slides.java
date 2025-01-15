@@ -8,7 +8,7 @@ public class Slides {
 
     public static final int minSlideTicks = 0;
     public static final int maxSlideTicks = -2000;
-    public static final int topBarHeight = -1300;
+    public static final int topBarHeight = -1450;
 
     public DcMotor slideMotor = null;
 

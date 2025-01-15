@@ -91,7 +91,7 @@ public class Main extends OpMode {
 
         // Slides
         float slidesPower = (gamepad2.right_trigger - gamepad2.left_trigger);
-        slides.moveSlides(slidesPower);
+        slides.moveSlides(slidesPower * 100.0);
 
         // Intake
         //float intakePower = 0.0f;

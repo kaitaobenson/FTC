@@ -53,12 +53,13 @@ public class AutoRoadRunner extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d(0, -60, 1.5708));
         TrajectorySequence myTrajectory = drive.trajectorySequenceBuilder(new Pose2d(0, -60, 1.5708))
                 .addDisplacementMarker(() -> {state = STATE_ENUM.RAISING_SLIDES_TO_BAR;})
-                .forward(30)
-                .waitSeconds(1)
+                .forward(20)
+                //.waitSeconds(1)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.ATTACHING_SPECIMEN;})
+                //.waitSeconds(1)
                 .back(2)
                 .strafeLeft(1)
-                .splineTo(new Vector2d(-49, -39), 3.14)
+                .splineTo(new Vector2d(-47, -39), 3.14)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.LOWERING_ARM_TO_SPECIMEN;})
                 .forward(0.1)
                 .waitSeconds(0.6)
@@ -70,9 +71,10 @@ public class AutoRoadRunner extends LinearOpMode {
                 .addDisplacementMarker(() -> {state = STATE_ENUM.RAISING_ARM_WITH_SPECIMEN;})
                 .turn(1.5708)
                 .forward(1)
-                .splineTo(new Vector2d(57, -53), -2.35619449019)
+                .splineTo(new Vector2d(-57, -51), -2.35619449019)
                 .addTemporalMarker(15, () -> {state = STATE_ENUM.RAISING_SLIDES_TO_BASKET;})
-                .addTemporalMarker(18.5, () -> {state = STATE_ENUM.DROPPING_SPECIMEN;})
+                .back(0.1)
+                .addTemporalMarker(25, () -> {state = STATE_ENUM.DROPPING_SPECIMEN;})
                 .waitSeconds(3)
                 .build();
 
@@ -81,7 +83,7 @@ public class AutoRoadRunner extends LinearOpMode {
 
         drive.followTrajectorySequenceAsync(myTrajectory);
         arm.closeClaw();
-        arm.moveArmUp();
+        arm.moveArmSlightlyOver();
 
         while (!isStopRequested()) {
             drive.update();
