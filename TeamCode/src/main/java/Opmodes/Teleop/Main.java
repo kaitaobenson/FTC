@@ -117,6 +117,20 @@ public class Main extends OpMode {
             hang.turnOff();
         }
 
+        if (gamepad2.y) {
+            arm.moveArmUp();
+            slides.moveTowardHighBasket();
+        }
+
+       if(gamepad2.x) {
+           if (-slides.slideMotor.getCurrentPosition() > 250) {
+               slides.moveSlides(1); // down
+           }
+           else {
+               arm.moveArmDown();
+           }
+       }
+
         /*
         telemetry.addData("Drive: Front Left Motor", drive.frontLeftMotor.getPower());
         telemetry.addData("Drive: Front Right Motor", drive.frontRightMotor.getPower());
