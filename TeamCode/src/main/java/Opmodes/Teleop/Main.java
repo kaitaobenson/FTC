@@ -11,7 +11,6 @@ import Components.Arm;
 import Components.ButtonHandler;
 import Components.Drive;
 import Components.Hang;
-import Components.Intake;
 import Components.Slides;
 import Util.Vector2;
 
@@ -20,8 +19,7 @@ public class Main extends OpMode {
 
     IMU imu;
     Drive drive;
-    Hang hang;
-    Intake intake;
+    //Hang hang;
     Slides slides;
     Arm arm;
     double servo_pos = 0;
@@ -47,25 +45,22 @@ public class Main extends OpMode {
 
         drive = new Drive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, imu);
 
-        // Intake config
-        //DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
-        //Servo intakeTiltServo = hardwareMap.servo.get("intakeTiltServo");
-
-        //intake = new Intake(intakeMotor);
-
         // Slides config
         DcMotor slideMotor = hardwareMap.dcMotor.get("slidesMotor");
 
         slides = new Slides(slideMotor);
 
         // Hang config
+        /*
         DcMotor leftHangMotor = hardwareMap.dcMotor.get("leftHangMotor");
         DcMotor rightHangMotor = hardwareMap.dcMotor.get("parallelEncoder");
         Servo leftHangServo = hardwareMap.servo.get("leftHangServo");
         Servo rightHangServo = hardwareMap.servo.get("rightHangServo");
 
         hang = new Hang(leftHangMotor, rightHangMotor, leftHangServo, rightHangServo);
+        */
 
+        // Arm config
         Servo armServo = hardwareMap.servo.get("armServo");
         Servo clawServo = hardwareMap.servo.get("clawServo");
 
@@ -93,13 +88,8 @@ public class Main extends OpMode {
         float slidesPower = (gamepad2.right_trigger - gamepad2.left_trigger);
         slides.moveSlides(slidesPower * 100.0);
 
-        // Intake
-        //float intakePower = 0.0f;
-        //intakePower += gamepad2.right_trigger > 0.8 ? 0.5 : 0;
-        //intakePower += gamepad2.left_trigger > 0.8 ? -0.5 : 0;
-        //intake.moveIntake(intakePower);
-
         // Hang
+        /*
         if (gamepad2.dpad_up) {
             hang.goUp(1);
         }
@@ -116,13 +106,14 @@ public class Main extends OpMode {
         else {
             hang.turnOff();
         }
+        */
 
         if (gamepad2.y) {
             arm.moveArmUp();
             slides.moveTowardHighBasket();
         }
 
-       if(gamepad2.x) {
+       if (gamepad2.x) {
            if (-slides.slideMotor.getCurrentPosition() > 250) {
                slides.moveSlides(1); // down
            }
@@ -136,7 +127,7 @@ public class Main extends OpMode {
         telemetry.addData("Drive: Front Right Motor", drive.frontRightMotor.getPower());
         telemetry.addData("Drive: Back Left Motor", drive.backLeftMotor.getPower());
         telemetry.addData("Drive: Back Right Motor", drive.backRightMotor.getPower());
-         */
+        */
 
         clawButtonHandler.update(gamepad2.a);
 
@@ -162,9 +153,9 @@ public class Main extends OpMode {
         telemetry.addData("Is above high bar", slides.isAboveHighBar());
 
         telemetry.addData("Slides: Position", slides.slideMotor.getCurrentPosition());
-        telemetry.addData("Hang: Left Hang Servo", hang.leftServo.getPosition());
-        telemetry.addData("Hang: Right Hang Servo", hang.rightServo.getPosition());
         telemetry.addData("Supposed servo pos", servo_pos);
+        //telemetry.addData("Hang: Left Hang Servo", hang.leftServo.getPosition());
+        //telemetry.addData("Hang: Right Hang Servo", hang.rightServo.getPosition());
 
         telemetry.update();
     }

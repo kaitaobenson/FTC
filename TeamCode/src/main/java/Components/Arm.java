@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+// Updated to use servo pulling w/ rope
 public class Arm {
     public Servo armServo;
     public Servo clawServo;
