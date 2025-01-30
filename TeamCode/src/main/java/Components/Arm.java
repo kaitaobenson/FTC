@@ -34,12 +34,12 @@ public class Arm {
 
     public void moveArmUp() {
         armState = ARM_STATE.UP;
-        armServo.setPosition(0.87);
+        armServo.setPosition(0.52);
     }
 
     public void moveArmDown() {
         armState = ARM_STATE.DOWN;
-        armServo.setPosition(0.3);
+        armServo.setPosition(0.85);
     }
 
     public void moveArmSlightlyOver() {

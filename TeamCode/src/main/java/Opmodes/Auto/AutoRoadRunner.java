@@ -30,6 +30,7 @@ public class AutoRoadRunner extends LinearOpMode {
         RAISING_SLIDES_TO_BASKET,
         LOWERING_ARM,
         DROPPING_SPECIMEN,
+        MOVING_SLIDES_TO_GROUND,
     }
 
     private STATE_ENUM state = STATE_ENUM.MOVING;
@@ -53,13 +54,13 @@ public class AutoRoadRunner extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d(0, -60, 1.5708));
         TrajectorySequence myTrajectory = drive.trajectorySequenceBuilder(new Pose2d(0, -60, 1.5708))
                 .addDisplacementMarker(() -> {state = STATE_ENUM.RAISING_SLIDES_TO_BAR;})
-                .forward(20)
+                .splineTo(new Vector2d(0, -34), 1.5708)
                 //.waitSeconds(1)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.ATTACHING_SPECIMEN;})
                 //.waitSeconds(1)
                 .back(2)
                 .strafeLeft(1)
-                .splineTo(new Vector2d(-47, -39), 3.14)
+                .splineTo(new Vector2d(-46.9, -30.6), 3.14)
                 .addDisplacementMarker(() -> {state = STATE_ENUM.LOWERING_ARM_TO_SPECIMEN;})
                 .forward(0.1)
                 .waitSeconds(0.6)
@@ -71,12 +72,18 @@ public class AutoRoadRunner extends LinearOpMode {
                 .addDisplacementMarker(() -> {state = STATE_ENUM.RAISING_ARM_WITH_SPECIMEN;})
                 .turn(1.5708)
                 .forward(1)
-                .splineTo(new Vector2d(-57, -51), -2.35619449019)
-                .addTemporalMarker(15, () -> {state = STATE_ENUM.RAISING_SLIDES_TO_BASKET;})
+                .addDisplacementMarker(() -> {state = STATE_ENUM.RAISING_SLIDES_TO_BASKET;})
+                .splineTo(new Vector2d(-55.2, -48.8), -2.35619449019)
                 .back(0.1)
                 .addTemporalMarker(25, () -> {state = STATE_ENUM.DROPPING_SPECIMEN;})
-                .waitSeconds(3)
+                .back(0.1)
+                .waitSeconds(1)
+                .back(0.1)
+                .addTemporalMarker(() -> {state = STATE_ENUM.MOVING_SLIDES_TO_GROUND;})
+
                 .build();
+
+        //TrajectorySequence traj2 =
 
 
         waitForStart();
@@ -126,6 +133,7 @@ public class AutoRoadRunner extends LinearOpMode {
             if (state == STATE_ENUM.RAISING_SLIDES_TO_BASKET) {
                 telemetry.addData("AUTO STATE", "Raising slides to basket");
                 if (slides.isAtTop()) {
+                    slides.moveSlides(0);
                     state = STATE_ENUM.LOWERING_ARM;
                 }
                 else {
@@ -133,6 +141,12 @@ public class AutoRoadRunner extends LinearOpMode {
                 }
             }
             if (state == STATE_ENUM.LOWERING_ARM) {
+                if (!slides.isAtTop()) {
+                    slides.moveSlides(-0.3);
+                }
+                else {
+                    slides.moveSlides(0);
+                }
                 telemetry.addData("AUTO STATE", "Lowering arm");
                 arm.moveArmSlightlyOver();
             }

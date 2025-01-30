@@ -20,7 +20,7 @@ public class SplineCreator {
                         .forward(5.4)
                         .waitSeconds(1)
                         .strafeLeft(1)
-                        .splineTo(new Vector2d(-46, -39), 3.14)
+                        .splineTo(new Vector2d(-47, -35), 3.14)
                         .waitSeconds(2)
                         .turn(1.5708)
                         .forward(1)
