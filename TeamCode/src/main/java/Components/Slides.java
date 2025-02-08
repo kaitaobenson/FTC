@@ -26,7 +26,7 @@ public class Slides {
                 stayAtPosition = slideMotor.getCurrentPosition();
             }
             if (slideMotor.getCurrentPosition() > stayAtPosition) {
-                power = -0.3;
+                power = -0.2;
             }
         }
         else {
@@ -52,17 +52,19 @@ public class Slides {
         return slideMotor.getCurrentPosition() < topBarHeight;
     }
 
-    public boolean isAboveHighBasket() {
-        return false;
-    }
-
     public void moveTowardHighBar() {
         if (!isAboveHighBar()) {
             moveSlides(-1);
         }
     }
 
-    public void moveTowardHighBasket() {
+    public boolean isAboveHighBasket() {
+        return slideMotor.getCurrentPosition() < maxSlideTicks;
+    }
 
+    public void moveTowardHighBasket() {
+        if (!isAboveHighBasket()) {
+            moveSlides(-1);
+        }
     }
 }
