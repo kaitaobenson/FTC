@@ -105,9 +105,9 @@ public class DriveConstants {
      * A documented case of a similar error which served as an impetus for this reasoning can be found here:
      * https://github.com/acmerobotics/road-runner-quickstart/issues/91
      */
-    public static double MAX_VEL = 30;
-    public static double MAX_ACCEL = 20;
-    public static double MAX_ANG_VEL = 22;
+    public static double MAX_VEL = 20;
+    public static double MAX_ACCEL = 10;
+    public static double MAX_ANG_VEL = 15;
     public static double MAX_ANG_ACCEL = 3;
 
 

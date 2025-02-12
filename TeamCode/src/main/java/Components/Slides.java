@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Slides {
 
     public static final int minSlideTicks = 0;
-    public static final int maxSlideTicks = -2000;
+    public static final int maxSlideTicks = -4000;
     public static final int topBarHeight = -1450;
 
     private float stayAtPosition = 0;
