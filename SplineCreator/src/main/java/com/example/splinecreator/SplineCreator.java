@@ -9,7 +9,7 @@ import org.rowlandhall.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class SplineCreator {
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(800);
+        MeepMeep meepMeep = new MeepMeep(810);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
