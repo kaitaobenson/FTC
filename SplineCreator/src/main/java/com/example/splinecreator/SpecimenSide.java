@@ -7,7 +7,7 @@ import org.rowlandhall.meepmeep.MeepMeep;
 import org.rowlandhall.meepmeep.roadrunner.DefaultBotBuilder;
 import org.rowlandhall.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class SplineCreator {
+public class SpecimenSide {
     static Vector2d block1_pos = new Vector2d(-48.85, -37.46);
     static Vector2d block2_pos = new Vector2d(-57, -37.47);
     static Vector2d block3_pos = new Vector2d(-58.7, -36.3);
@@ -28,23 +28,25 @@ public class SplineCreator {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(40, 25, 20, 10, 11)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-25, -58.24, right))
-                        .lineToLinearHeading(new Pose2d(basket_pos, basket_dir))
+                .setConstraints(40, 35, 20, 10, 11)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(0, -60, forward))
+                        .lineTo(new Vector2d(0, -33))
                         .waitSeconds(2)
-                        .lineToLinearHeading(new Pose2d(block1_pos, forward))
-                        .waitSeconds(2)
-                        .lineToLinearHeading(new Pose2d(basket_pos, basket_dir))
-                        .waitSeconds(2)
-                        .lineToLinearHeading(new Pose2d(block2_pos, forward))
-                        .waitSeconds(2)
-                        .lineToLinearHeading(new Pose2d(basket_pos, basket_dir))
-                        .waitSeconds(2)
-                        .lineToLinearHeading(new Pose2d(block3_pos, block3_heading))
-                        .waitSeconds(2)
-                        .lineToLinearHeading(new Pose2d(basket_pos, basket_dir))
-                        .waitSeconds(2)
-                        .lineToLinearHeading(new Pose2d(-30, 0, left))
+                        .lineTo(new Vector2d(-block1_pos.getX(), block1_pos.getY()))
+                        .waitSeconds(0.5)
+                        .lineToLinearHeading(new Pose2d(0, -40, right))
+                        .waitSeconds(0.3)
+                        .lineToLinearHeading(new Pose2d(-block2_pos.getX(), block2_pos.getY(), forward))
+                        .waitSeconds(0.5)
+                        .lineToLinearHeading(new Pose2d(0, -43, right))
+                        .waitSeconds(0.3)
+                        .lineToLinearHeading(new Pose2d(-block3_pos.getX(), block3_pos.getY(), -block3_heading + deg2rad(180)))
+                        .waitSeconds(0.5)
+                        .lineToLinearHeading(new Pose2d(0, -46, right))
+                        .waitSeconds(0.3)
+                        .lineToLinearHeading(new Pose2d(50, -40, back))
+                        .waitSeconds(0.5)
+                        .lineToLinearHeading(new Pose2d(0, -49, right))
                         .build()
                 );
 

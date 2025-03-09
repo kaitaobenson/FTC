@@ -9,6 +9,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
+import java.util.ArrayList;
+
 import Util.Vector2;
 
 public class Drive {
@@ -63,6 +65,36 @@ public class Drive {
 
     public void zeroRotation() {
         imu.resetYaw();
+    }
+
+    // frontLeftPower, backLeftPower, frontRightPower, backRightMotor
+    public static double[] directionToMotorPower(Vector2 direction, float rotation) {
+        float rx = rotation;
+
+        double power = Math.hypot(direction.x, direction.y);
+        double inputAngle = Math.atan2(direction.y, direction.x);
+
+        double cos = Math.cos(inputAngle - Math.PI / 4);
+        double sin = Math.sin(inputAngle - Math.PI / 4);
+
+        double frontLeftPower = cos * power + rx;
+        double backLeftPower = sin * power - rx;
+        double frontRightPower = sin * -power - rx;
+        double backRightPower = cos * power - rx;
+
+        // Normalize motor powers
+        double maxPower = Math.max(Math.abs(frontLeftPower),
+                Math.max(Math.abs(backLeftPower),
+                        Math.max(Math.abs(frontRightPower), Math.abs(backRightPower))));
+
+        if (maxPower > 1.0) {
+            frontLeftPower /= maxPower;
+            backLeftPower /= maxPower;
+            frontRightPower /= maxPower;
+            backRightPower /= maxPower;
+        }
+
+        return new double[]{frontLeftPower, backLeftPower, frontRightPower, backRightPower};
     }
 
     // speed is from 0 to 1
