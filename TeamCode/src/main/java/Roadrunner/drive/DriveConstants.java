@@ -56,8 +56,8 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.020797940736330018;
-    public static double kA = 0.02;
+    public static double kV = 0.019;
+    public static double kA = 0.002;
     public static double kStatic = 0.05;
 
     /* About line 76 in your DriveConstants.java. Add this if not present, and configure it yourself */
@@ -105,10 +105,10 @@ public class DriveConstants {
      * A documented case of a similar error which served as an impetus for this reasoning can be found here:
      * https://github.com/acmerobotics/road-runner-quickstart/issues/91
      */
-    public static double MAX_VEL = 20;
-    public static double MAX_ACCEL = 10;
-    public static double MAX_ANG_VEL = 15;
-    public static double MAX_ANG_ACCEL = 3;
+    public static double MAX_VEL = 40;
+    public static double MAX_ACCEL = 35;
+    public static double MAX_ANG_VEL = 28;
+    public static double MAX_ANG_ACCEL = 20;
 
 
     public static double encoderTicksToInches(double ticks) {

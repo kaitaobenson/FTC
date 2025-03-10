@@ -19,7 +19,7 @@ public class Drive {
     public DcMotor frontRightMotor = null;
     public DcMotor backLeftMotor = null;
     public DcMotor backRightMotor = null;
-    public boolean useFieldDirections = false;
+    public boolean useFieldDirections = true;
 
     private boolean lockRotation = false;
     private double startRotation = 0;

@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Slides {
 
     public static final int minSlideTicks = 0;
-    public static final int maxSlideTicks = -4000;
-    public static final int topBarHeight = -1450;
+    public static final int maxSlideTicks = -3800;
+    public static final int topBarHeight = -1400;
 
     private float stayAtPosition = 0;
     private boolean slidesStopped = false;
@@ -34,8 +34,7 @@ public class Slides {
         }
 
         slideMotor.setPower(power);
-        if (!((slideMotor.getCurrentPosition() < minSlideTicks && power < 0) ||
-                (slideMotor.getCurrentPosition() > maxSlideTicks && power > 0))) {
+        if (!((slideMotor.getCurrentPosition() < maxSlideTicks && power < 0) || (slideMotor.getCurrentPosition() > minSlideTicks && power > 0))) {
             slideMotor.setPower(power);
         }
     }
