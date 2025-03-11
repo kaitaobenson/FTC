@@ -28,7 +28,7 @@ public class SplineCreator {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(40, 25, 20, 10, 11)
+                .setConstraints(40, 35, 28, 20, 11)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-25, -58.24, right))
                         .lineToLinearHeading(new Pose2d(basket_pos, basket_dir))
                         .waitSeconds(2)

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import Util.Vector2;
 
 public class Drive {
-
     public DcMotor frontLeftMotor = null;
     public DcMotor frontRightMotor = null;
     public DcMotor backLeftMotor = null;
@@ -24,6 +23,14 @@ public class Drive {
     private boolean lockRotation = false;
     private double startRotation = 0;
     private IMU imu;
+
+    public enum DRIVE_ROT_STATE {
+        BASKET,
+        SUBMERSIBLE,
+    }
+
+    public DRIVE_ROT_STATE driveRotState = DRIVE_ROT_STATE.SUBMERSIBLE;
+    private boolean manualOverride = true;
 
     public Drive(DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, IMU imu) {
         this.frontLeftMotor = frontLeftMotor;
@@ -101,17 +108,27 @@ public class Drive {
     public void moveInDirection(Vector2 direction, float rotation, float speed) {
         float rx = rotation * speed;
 
-        if (lockRotation) {
-            double currentRotation = getCurrentRotationRadians();
-            if (currentRotation < startRotation - 0.2) {
-                rx = -0.05f;
+        double fieldRotation = imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS);
+
+        if (rotation == 0 && !manualOverride) {
+            double targetRot = 0;
+            if (driveRotState == DRIVE_ROT_STATE.SUBMERSIBLE) {
+                targetRot = 0.0f;
             }
-            if (currentRotation > startRotation + 0.2) {
-                rx = 0.05f;
+            if (driveRotState == DRIVE_ROT_STATE.BASKET) {
+                targetRot = (2.35619449019 + Math.PI / 2.0f);
+            }
+            if (fieldRotation < targetRot) {
+                rx = 0.1f;
+            }
+            if (fieldRotation > targetRot) {
+                rx = -0.1f;
+            }
+            if (Math.abs(fieldRotation - rotation) < 0.05) {
+                rx = 0;
+                manualOverride = true;
             }
         }
-
-        double fieldRotation = imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS);
 
         double power = Math.hypot(direction.x, direction.y);
         double inputAngle = Math.atan2(direction.y, direction.x) - (useFieldDirections ? fieldRotation : 0);

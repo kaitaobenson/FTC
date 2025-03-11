@@ -46,7 +46,7 @@ public class SpecimenSide {
                         .waitSeconds(0.3)
                         .lineToLinearHeading(new Pose2d(50, -40, back))
                         .waitSeconds(0.5)
-                        .lineToLinearHeading(new Pose2d(0, -49, right))
+                        .lineToLinearHeading(new Pose2d(50, -58, right))
                         .build()
                 );
 

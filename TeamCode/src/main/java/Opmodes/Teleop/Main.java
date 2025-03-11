@@ -25,6 +25,7 @@ public class Main extends OpMode {
     double servo_pos = 0;
 
     ButtonHandler clawButtonHandler;
+    ButtonHandler botRotationHandler;
 
     @Override
     public void init() {
@@ -62,6 +63,7 @@ public class Main extends OpMode {
 
         arm = new Arm(armServo, clawServo);
         clawButtonHandler = new ButtonHandler();
+        botRotationHandler = new ButtonHandler();
     }
 
     @Override
@@ -105,6 +107,17 @@ public class Main extends OpMode {
             }
             else if (arm.clawState == Arm.CLAW_STATE.CLOSED) {
                 arm.openClaw();
+            }
+        }
+
+        botRotationHandler.update(gamepad1.a);
+
+        if (clawButtonHandler.justPressed) {
+            if (drive.driveRotState == Drive.DRIVE_ROT_STATE.SUBMERSIBLE) {
+                drive.driveRotState = Drive.DRIVE_ROT_STATE.BASKET;
+            }
+            else if (drive.driveRotState == Drive.DRIVE_ROT_STATE.BASKET) {
+                drive.driveRotState = Drive.DRIVE_ROT_STATE.SUBMERSIBLE;
             }
         }
 
