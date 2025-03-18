@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import java.util.ArrayList;
 
+import Util.Pose2D;
 import Util.Vector2;
 
 public class Drive {
@@ -67,20 +68,22 @@ public class Drive {
         imu.resetYaw();
     }
 
-    // frontLeftPower, backLeftPower, frontRightPower, backRightMotor
-    public static double[] directionToMotorPower(Vector2 direction, float rotation) {
-        float rx = rotation;
+    public static double[] poseToMotorPower(Pose2D pose) {
+        return directionToMotorPower(new Vector2(pose.x, pose.y), pose.heading);
+    }
 
+    // frontLeftPower, backLeftPower, frontRightPower, backRightMotor
+    public static double[] directionToMotorPower(Vector2 direction, double rotation) {
         double power = Math.hypot(direction.x, direction.y);
         double inputAngle = Math.atan2(direction.y, direction.x);
 
         double cos = Math.cos(inputAngle - Math.PI / 4);
         double sin = Math.sin(inputAngle - Math.PI / 4);
 
-        double frontLeftPower = cos * power + rx;
-        double backLeftPower = sin * power - rx;
-        double frontRightPower = sin * -power - rx;
-        double backRightPower = cos * power - rx;
+        double frontLeftPower = cos * power + rotation;
+        double backLeftPower = sin * power - rotation;
+        double frontRightPower = sin * -power - rotation;
+        double backRightPower = cos * power - rotation;
 
         // Normalize motor powers
         double maxPower = Math.max(Math.abs(frontLeftPower),

@@ -90,7 +90,7 @@ public class Main extends OpMode {
         if (gamepad2.dpad_up) {
             hang.goUp(1);
         }
-        if (gamepad2.dpad_down) {
+        else if (gamepad2.dpad_down) {
             hang.goDown(1);
         }
         else {

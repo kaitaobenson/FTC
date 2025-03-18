@@ -48,7 +48,7 @@ public class ParameterTuner extends LinearOpMode {
 
             previousPosition = current_position;
             previousTime = time;
-            pathFollower.setDriveSignal(new Vector2(0, Constants.testMaxVel), new Vector2(0, 0));
+            pathFollower.updateFeedforwardOnly(new Vector2(0, Constants.testMaxVel), new Vector2(0, 0), 0, 0, customkV, customkA);
 
             telemetry.addData("Status", "Tuning kV");
             telemetry.addData("Current kV", customkV);
@@ -85,7 +85,7 @@ public class ParameterTuner extends LinearOpMode {
             previousPosition = current_position;
             previousVelocity = current_velocity;
             previousTime = time;
-            pathFollower.setDriveSignal(new Vector2(0, current_velocity), new Vector2(0, Constants.testMaxAccel));
+            pathFollower.updateFeedforwardOnly(new Vector2(0, current_velocity), new Vector2(0, Constants.testMaxAccel), 0, 0, customkV, customkA);
 
             telemetry.addData("Status", "Tuning kA");
             telemetry.addData("Current kA", customkA);

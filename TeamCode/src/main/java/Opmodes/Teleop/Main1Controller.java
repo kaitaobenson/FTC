@@ -16,7 +16,6 @@ import Util.Vector2;
 
 @TeleOp(name = "Main", group = "Working")
 public class Main1Controller extends OpMode {
-
     IMU imu;
     Drive drive;
     Hang hang;
@@ -55,7 +54,6 @@ public class Main1Controller extends OpMode {
         DcMotor rightHangMotor = hardwareMap.dcMotor.get("parallelEncoder");
 
         hang = new Hang(leftHangMotor, rightHangMotor);
-
 
         // Arm config
         Servo armServo = hardwareMap.servo.get("armServo");
