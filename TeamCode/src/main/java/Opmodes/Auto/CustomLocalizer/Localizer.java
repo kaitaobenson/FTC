@@ -17,11 +17,21 @@ public class Localizer {
     private int prevParallelTicks;
     private int prevPerpTicks;
     private double prevTheta;
+    private double initialTheta;
 
     public Localizer(Encoder perpEncoder, Encoder parallelEncoder, IMU imu, Vector2 initialPos, double initialTheta) {
         this.perpEncoder = perpEncoder;
         this.parallelEncoder = parallelEncoder;
         this.pos = initialPos;
+        this.prevTheta = initialTheta;
+        this.imu = imu;
+
+        this.parallelEncoder.setDirection(Encoder.Direction.REVERSE);
+        this.perpEncoder.setDirection(Encoder.Direction.REVERSE);
+
+        this.prevParallelTicks = parallelEncoder.getCurrentPosition();
+        this.prevPerpTicks = perpEncoder.getCurrentPosition();
+        this.initialTheta = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         this.prevTheta = initialTheta;
     }
 
@@ -43,10 +53,11 @@ public class Localizer {
     }
 
     public Vector2 getPos() {
-        return pos;
+        Vector2 out = pos.multiply(Math.PI);
+        return new Vector2(out.y, out.x);
     }
 
     public double getAngle() {
-        return prevTheta;
+        return prevTheta - initialTheta;
     }
 }

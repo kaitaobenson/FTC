@@ -11,7 +11,7 @@ import Roadrunner.util.Encoder;
 import Util.Vector2;
 import Util.Pose2D;
 
-public class CustomPathFollower {
+public class PIDFFollower {
     DcMotorEx leftFrontMotor;
     DcMotorEx leftRearMotor;
     DcMotorEx rightRearMotor;
@@ -29,7 +29,7 @@ public class CustomPathFollower {
     PIDAxis yPID;
     PIDAxis headingPID;
 
-    public CustomPathFollower(HardwareMap hardwareMap, Vector2 initialPos, double initialHeading) {
+    public PIDFFollower(HardwareMap hardwareMap, Vector2 initialPos, double initialHeading) {
         leftFrontMotor = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftRearMotor = hardwareMap.get(DcMotorEx.class, "leftRear");
         rightRearMotor = hardwareMap.get(DcMotorEx.class, "rightRear");
@@ -56,30 +56,34 @@ public class CustomPathFollower {
         headingPID = new PIDAxis(Constants.headingP, Constants.headingI, Constants.headingD);
     }
 
-    public void updatePIDF(Vector2 pos, Vector2 vel, Vector2 accel, double headingPos, double headingVel, double headingAccel, double customkA, double customkV) {
+    public void updatePIDF(Vector2 pos, Vector2 vel, Vector2 accel, double headingPos, double headingVel, double headingAccel, double customkV, double customkA) {
         Vector2 realPos = localizer.getPos();
         double realHeading = localizer.getAngle();
-        Pose2D feedforward = calculateFeedforward(vel, accel, headingVel, headingAccel, customkA, customkV);
+        Pose2D feedforward = calculateFeedforward(vel, accel, headingVel, headingAccel, customkV, customkA);
         Pose2D totalOffset = new Pose2D(
-                xPID.calculate(pos.x, realPos.x) + feedforward.x,
+                -xPID.calculate(pos.x, realPos.x) + feedforward.x,
                 yPID.calculate(pos.y, realPos.y) + feedforward.y,
                 headingPID.calculate(headingPos, realHeading) + feedforward.heading
         );
         setMotorPowers(Drive.poseToMotorPower(totalOffset));
     }
 
-    public void updateFeedforwardOnly(Vector2 vel, Vector2 accel, double headingVel, double headingAccel, double customkA, double customkV) {
-        setMotorPowers(Drive.poseToMotorPower(calculateFeedforward(vel, accel, headingVel, headingAccel, customkA, customkV)));
+    public void updatePIDF(Vector2 pos, Vector2 vel, Vector2 accel, double headingPos, double headingVel, double headingAccel) {
+        updatePIDF(pos, vel, accel, headingPos, headingVel, headingAccel, Constants.kV, Constants.kA);
+    }
+
+    public void updateFeedforwardOnly(Vector2 vel, Vector2 accel, double headingVel, double headingAccel, double customkV, double customkA) {
+        setMotorPowers(Drive.poseToMotorPower(calculateFeedforward(vel, accel, headingVel, headingAccel, customkV, customkA)));
     }
 
     public void updateFeedforwardOnly(Vector2 vel, Vector2 accel, double headingVel, double headingAccel) {
-        updateFeedforwardOnly(vel, accel, headingVel, headingAccel, Constants.kA, Constants.kV);
+        updateFeedforwardOnly(vel, accel, headingVel, headingAccel, Constants.kV, Constants.kA);
     }
 
-    public Pose2D calculateFeedforward(Vector2 vel, Vector2 accel, double headingVel, double headingAccel, double customkA, double customkV) {
-        double xFF = calculateFeedforwardAxis(vel.x, accel.x, customkA, customkV);
-        double yFF = calculateFeedforwardAxis(vel.y, accel.x, customkA, customkV);
-        double headingFF = calculateFeedforwardAxis(headingVel, headingAccel, customkA, customkV);
+    public Pose2D calculateFeedforward(Vector2 vel, Vector2 accel, double headingVel, double headingAccel, double customkV, double customkA) {
+        double xFF = calculateFeedforwardAxis(vel.x, accel.x, customkV, customkA);
+        double yFF = calculateFeedforwardAxis(vel.y, accel.y, customkV, customkA);
+        double headingFF = calculateFeedforwardAxis(headingVel, headingAccel, customkV, customkA);
         return new Pose2D(xFF, yFF, headingFF);
     }
 

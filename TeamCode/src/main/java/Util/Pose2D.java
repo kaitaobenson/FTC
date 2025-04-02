@@ -10,4 +10,22 @@ public class Pose2D {
         this.y = y;
         this.heading = heading;
     }
+
+    public void setVector(Vector2 set) {
+        x = set.x;
+        y = set.y;
+    }
+
+    public Vector2 getVector() {
+        return new Vector2(x, y);
+    }
+
+    public void setHeading(double newHeading) {
+        while (newHeading > 360) {
+            newHeading -= 360;
+        }
+        while (newHeading < 0) {
+            newHeading += 360;
+        }
+    }
 }

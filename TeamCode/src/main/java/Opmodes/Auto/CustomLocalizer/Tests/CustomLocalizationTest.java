@@ -26,7 +26,7 @@ public class CustomLocalizationTest extends LinearOpMode {
 
     IMU imu;
 
-    private static final Vector2 initialPos = new Vector2(0, -60);
+    private static final Vector2 initialPos = new Vector2(0, 0);
     private static final double initialHeading = 0;
 
     @Override
@@ -54,9 +54,13 @@ public class CustomLocalizationTest extends LinearOpMode {
         waitForStart();
 
         while (!isStopRequested()) {
+            localizer.update();
+
             telemetry.addData("Position X", localizer.getPos().x);
             telemetry.addData("Position Y", localizer.getPos().y);
             telemetry.addData("Heading", localizer.getAngle());
+
+            telemetry.update();
         }
     }
 }
