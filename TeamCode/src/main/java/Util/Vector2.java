@@ -84,4 +84,8 @@ public class Vector2 {
         this.x = x * cosAngle - y * sinAngle;
         this.y = x * sinAngle + y * cosAngle;
     }
+
+    public Vector2 lerp(Vector2 to, double t) {
+        return new Vector2(x + (to.x - x) * t, y + (to.y - y) * t);
+    }
 }

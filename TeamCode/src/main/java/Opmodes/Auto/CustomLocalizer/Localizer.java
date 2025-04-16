@@ -37,9 +37,9 @@ public class Localizer {
 
     public void update() {
         Vector2 deltaTicks = new Vector2(perpEncoder.getCurrentPosition() - prevPerpTicks, parallelEncoder.getCurrentPosition() - prevParallelTicks);
-        Vector2 deltaInches = deltaTicks.multiply(Constants.TICKS_PER_INCH);
+        Vector2 deltaInches = deltaTicks.multiply(Constants.TICKS_PER_INCH).multiply(new Vector2(Constants.X_MULTIPLIER, Constants.Y_MULTIPLIER));
 
-        double theta = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double theta = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - initialTheta;
         double averageTheta = (prevTheta + theta) / 2.0;
         double cosTheta = Math.cos(averageTheta);
         double sinTheta = Math.sin(averageTheta);
@@ -58,6 +58,6 @@ public class Localizer {
     }
 
     public double getAngle() {
-        return prevTheta - initialTheta;
+        return prevTheta;
     }
 }

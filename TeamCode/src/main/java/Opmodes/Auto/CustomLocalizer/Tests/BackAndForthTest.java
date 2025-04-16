@@ -15,14 +15,13 @@ public class BackAndForthTest extends LinearOpMode {
         pathSequenceFollower = new DynamicPathFollower(hardwareMap, new Vector2(0, 0), 0, telemetry);
 
         waitForStart();
+        pathSequenceFollower.back(36);
 
         while (!isStopRequested()) {
             PathFollowerUpdateError out = pathSequenceFollower.update();
 
             if (out == PathFollowerUpdateError.NO_PATH) {
-                telemetry.addData("No path", 0);
-                pathSequenceFollower.back(60);
-                pathSequenceFollower.forward(60);
+                return;
             }
 
             telemetry.update();

@@ -3,8 +3,9 @@ package Opmodes.Auto.CustomLocalizer.PathSegments;
 import Util.Pose2D;
 
 public class WaitSegment extends PathSegment {
-    private final double startTime;
+    private double startTime;
     private final double time;
+    boolean firstUpdate = true;
 
     // Time in seconds
     public WaitSegment(Pose2D pos, double time) {
@@ -14,6 +15,11 @@ public class WaitSegment extends PathSegment {
     }
 
     public void update() {
+        if (firstUpdate) {
+            startTime = System.currentTimeMillis();
+            firstUpdate = false;
+        }
+
         if (System.currentTimeMillis() - startTime >= time * 1000) {
             isFinished = true;
         }

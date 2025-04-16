@@ -68,22 +68,22 @@ public class Drive {
         imu.resetYaw();
     }
 
-    public static double[] poseToMotorPower(Pose2D pose) {
-        return directionToMotorPower(new Vector2(pose.x, pose.y), pose.heading);
+    public static double[] poseToMotorPower(Pose2D pose, double realRotation) {
+        return directionToMotorPower(new Vector2(pose.x, pose.y), pose.heading, realRotation);
     }
 
     // frontLeftPower, backLeftPower, frontRightPower, backRightMotor
-    public static double[] directionToMotorPower(Vector2 direction, double rotation) {
+    public static double[] directionToMotorPower(Vector2 direction, double rotation, double realRotation) {
         double power = Math.hypot(direction.x, direction.y);
-        double inputAngle = Math.atan2(direction.y, direction.x);
+        double inputAngle = Math.atan2(direction.y, direction.x) - realRotation;
 
         double cos = Math.cos(inputAngle - Math.PI / 4);
         double sin = Math.sin(inputAngle - Math.PI / 4);
 
-        double frontLeftPower = cos * power + rotation;
+        double frontLeftPower = cos * power - rotation;
         double backLeftPower = sin * power - rotation;
         double frontRightPower = sin * -power - rotation;
-        double backRightPower = cos * power - rotation;
+        double backRightPower = cos * power + rotation;
 
         // Normalize motor powers
         double maxPower = Math.max(Math.abs(frontLeftPower),
@@ -122,10 +122,10 @@ public class Drive {
         double cos = Math.cos(inputAngle - Math.PI / 4);
         double sin = Math.sin(inputAngle - Math.PI / 4);
 
-        double frontLeftPower = cos * power * speed + rx;
+        double frontLeftPower = cos * power * speed - rx;
         double backLeftPower = sin * power * speed - rx;
         double frontRightPower = sin * -power * speed - rx;
-        double backRightPower = cos * power * speed - rx;
+        double backRightPower = cos * power * speed + rx;
 
         // Normalize motor powers
         double maxPower = Math.max(Math.abs(frontLeftPower),

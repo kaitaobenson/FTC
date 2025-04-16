@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import Opmodes.Auto.CustomLocalizer.DynamicPathFollower;
 import Opmodes.Auto.CustomLocalizer.PathFollowerUpdateError;
-import Opmodes.Auto.CustomLocalizer.PathSegments.LineSegment;
+import Util.Pose2D;
 import Util.Vector2;
 
-@Autonomous(name = "SquareTest", group = "Auto")
-public class SquareTest extends LinearOpMode {
+@Autonomous(name = "LineSegmentTest", group = "Auto")
+public class LineSegmentTest extends LinearOpMode {
     DynamicPathFollower pathSequenceFollower;
 
     public void runOpMode() throws InterruptedException {
@@ -17,12 +17,18 @@ public class SquareTest extends LinearOpMode {
 
         waitForStart();
 
+        double a = 90;
+
         while (!isStopRequested()) {
             PathFollowerUpdateError out = pathSequenceFollower.update();
 
             if (out == PathFollowerUpdateError.NO_PATH) {
-                pathSequenceFollower.forward(24);
-                pathSequenceFollower.turn(90);
+                a += 90;
+                if (a == 360) {
+                    a = 0;
+                }
+                pathSequenceFollower.lineTo(new Pose2D(0, -24, a));
+                pathSequenceFollower.lineTo(new Pose2D(0, 0, a - 90));
             }
 
             telemetry.update();

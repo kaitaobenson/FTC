@@ -6,11 +6,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.ArrayList;
 
+import Opmodes.Auto.CustomLocalizer.PathSegments.BezierSegment;
 import Opmodes.Auto.CustomLocalizer.PathSegments.CodeSegment;
 import Opmodes.Auto.CustomLocalizer.PathSegments.LineSegment;
 import Opmodes.Auto.CustomLocalizer.PathSegments.LineSegmentConstantHeading;
 import Opmodes.Auto.CustomLocalizer.PathSegments.PathSegment;
 import Opmodes.Auto.CustomLocalizer.PathSegments.TurnSegment;
+import Opmodes.Auto.CustomLocalizer.PathSegments.WaitSegment;
 import Util.CustomCallable;
 import Util.Pose2D;
 import Util.Vector2;
@@ -27,7 +29,7 @@ public class DynamicPathFollower {
     private Telemetry telemetry;
 
     public DynamicPathFollower(HardwareMap hardwareMap, Vector2 initialPos, double initialHeading, Telemetry telemetry) {
-        pointFollower = new PIDFFollower(hardwareMap, initialPos, initialHeading);
+        pointFollower = new PIDFFollower(hardwareMap, initialPos, initialHeading, telemetry);
         finalPos = new Pose2D(initialPos.x, initialPos.y, initialHeading);
         this.telemetry = telemetry;
     }
@@ -54,18 +56,14 @@ public class DynamicPathFollower {
         pointFollower.updatePIDF(
                 currentSegment.getPos().getVector(),
                 currentSegment.getVel(),
-                currentSegment.getAccel(), currentSegment.getPos().heading,
+                currentSegment.getAccel(),
+                Math.toRadians(currentSegment.getPos().heading),
                 currentSegment.getHeadingVel(),
                 currentSegment.getHeadingAccel()
         );
 
         if (currentSegment.isFinished) {
-            timeStartedCurrentPathSegment = System.currentTimeMillis();
             pathQueue.remove(0);
-        }
-        else if (System.currentTimeMillis() - timeStartedCurrentPathSegment > maxPathSegmentTime) {
-            pathQueue.remove(0);
-            return PathFollowerUpdateError.ERROR_TIMEOUT;
         }
 
         return PathFollowerUpdateError.SUCCESS;
@@ -76,7 +74,7 @@ public class DynamicPathFollower {
     }
 
     public void forward(double distance) {
-        Vector2 endVector = finalPos.getVector().add(Vector2.fromAngle(finalPos.heading + Math.PI / 2.0).multiply(-distance));
+        Vector2 endVector = finalPos.getVector().add(Vector2.fromAngle(Math.toRadians(finalPos.heading + 90)).multiply(-distance));
         addPathSegment(new LineSegmentConstantHeading(finalPos, new Pose2D(endVector.x, endVector.y, finalPos.heading), telemetry));
     }
 
@@ -85,7 +83,23 @@ public class DynamicPathFollower {
     }
 
     public void turn(double angle) {
-        addPathSegment(new TurnSegment(finalPos.getVector(), finalPos.heading, finalPos.heading + angle));
+        addPathSegment(new TurnSegment(finalPos.getVector(), finalPos.heading, finalPos.heading + angle, telemetry));
+    }
+
+    public void lineTo(Pose2D endPos) {
+        addPathSegment(new LineSegment(finalPos, endPos, telemetry));
+    }
+
+    public void lineToConstantHeading(Vector2 endPos) {
+        addPathSegment(new LineSegmentConstantHeading(finalPos, new Pose2D(endPos.x, endPos.y, finalPos.heading), telemetry));
+    }
+
+    public void splineTo(Pose2D endPos) {
+        addPathSegment(new BezierSegment(finalPos, endPos, 10, telemetry));
+    }
+
+    public void waits(double time) {
+        addPathSegment(new WaitSegment(finalPos, time));
     }
 
     public void function(CustomCallable call) {

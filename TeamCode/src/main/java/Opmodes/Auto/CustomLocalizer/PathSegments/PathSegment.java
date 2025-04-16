@@ -32,10 +32,10 @@ public abstract class PathSegment {
     }
 
     public double getHeadingVel() {
-        return currentVelocity.heading;
+        return Math.toRadians(currentVelocity.heading);
     }
 
     public double getHeadingAccel() {
-        return currentAcceleration.heading;
+        return Math.toRadians(currentAcceleration.heading);
     }
 }
